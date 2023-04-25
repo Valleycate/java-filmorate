@@ -41,7 +41,7 @@ public class UserController {
         if(user.getName() == null || user.getName().isEmpty() || user.getName().isBlank() ){
             user.setName(user.getLogin());
         }
-        if (user.getBirthday().isAfter(ChronoLocalDate.from(LocalDateTime.now()))){
+        if (user.getBirthday().isAfter(LocalDateTime.now())){
             log.warn("В UserController при создании пользователя передали неверную дату рождения");
             throw new InvalidBirthdayException("Дата рождения не может быть в будущем");
         }
@@ -63,7 +63,10 @@ public class UserController {
             log.warn("В UserController при обновлении информации о пользователе передали неверный адрес электронной почты");
             throw new InvalidEmailException("Неверный адрес электронной почты");
         }
-
+        if (user.getBirthday().isAfter(LocalDateTime.now())){
+            log.warn("В UserController при создании пользователя передали неверную дату рождения");
+            throw new InvalidBirthdayException("Дата рождения не может быть в будущем");
+        }
         users.add(user);
         log.info("обновлена информация о пользователе - {}", user);
         return user;

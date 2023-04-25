@@ -65,7 +65,7 @@ public class FilmController {
         }
         if(film.getDuration() == null || film.getDuration().isNegative() ){
             log.warn("В FilmController при обновлении информации о фильме передали отрицательную продолжительность фильма");
-            throw new InvalidDurationException("продолжительность фильма должна быть положительной");
+            throw new InvalidDurationException("Продолжительность фильма должна быть положительной");
         }
         if (film.getReleaseDate().isBefore(LocalDateTime.of(1895, 12,28,00,00))){
             log.warn("В FilmController при обновлении информации о фильме передали дату релиза, " +

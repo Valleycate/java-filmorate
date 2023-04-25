@@ -1,9 +1,7 @@
 package model;
 
 import lombok.Data;
-import lombok.Setter;
-
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 public class User {
@@ -11,5 +9,5 @@ public class User {
     private String email;
     private String login;
     private String name;
-    private LocalDate birthday;
+    private LocalDateTime birthday;
 }
