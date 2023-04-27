@@ -35,7 +35,7 @@ public class FilmController {
             log.warn("В FilmController при создании фильма передали описание превышаюшее 200 символов");
             throw new InvalidDescriptionException("Описание слишком большое");
         }
-        if (film.getDuration() == null || film.getDuration() < 0 ) {
+        if (film.getDuration() == null || film.getDuration() < 0) {
             log.warn("В FilmController при создании фильма передали отрицательную продолжительность фильма");
             throw new InvalidDurationException("Продолжительность фильма должна быть положительной");
         }
@@ -52,7 +52,7 @@ public class FilmController {
 
     @PutMapping("/films")
     public Film update(@RequestBody Film film) {
-        if(film != null && allFilms.containsKey(film.getId())) {
+        if (film != null && allFilms.containsKey(film.getId())) {
             if (film.getName() == null || film.getName().isEmpty() || film.getName().isBlank()) {
                 log.warn("В FilmController при обновлении информации о фильме передали неверное имя");
                 throw new InvalidNameException("Неверное имя");
