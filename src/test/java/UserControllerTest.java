@@ -144,7 +144,7 @@ public class UserControllerTest {
             user.setName("Маша");
             user.setBirthday(LocalDate.of(2000, 2, 28));
             userController.update(user);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ignored) {
         }
         assertEquals(1, userController.findAll().size());
 
