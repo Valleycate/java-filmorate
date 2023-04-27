@@ -29,19 +29,19 @@ public class UserController {
     @PostMapping("/users")
     public User create(@RequestBody User user) {
 
-        if(user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().isBlank() || user.getLogin().contains(" ")){
+        if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
             log.warn("В UserController при создании пользователя передали неверный логин");
             throw new InvalidLoginException("Неверный логин");
         }
 
-        if(user.getEmail() == null || user.getEmail().isEmpty() || user.getEmail().isBlank() || !user.getEmail().contains("@")){
+        if (user.getEmail() == null || user.getEmail().isEmpty() || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             log.warn("В UserController при создании пользователя передали неверный адрес электронной почты");
             throw new InvalidEmailException("Неверный адрес электронной почты");
         }
-        if(user.getName() == null || user.getName().isEmpty() || user.getName().isBlank() ){
+        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-        if (user.getBirthday().isAfter(LocalDate.now())){
+        if (user.getBirthday().isAfter(LocalDate.now())) {
             log.warn("В UserController при создании пользователя передали неверную дату рождения");
             throw new InvalidBirthdayException("Дата рождения не может быть в будущем");
         }
@@ -54,7 +54,7 @@ public class UserController {
 
     @PutMapping("/users")
     public User update(@RequestBody User user) {
-        if(user != null && allUsers.containsKey(user.getId())) {
+        if (user != null && allUsers.containsKey(user.getId())) {
             if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
                 log.warn("В UserController при обновлении информации о пользователе передали неверный логин");
                 throw new InvalidLoginException("Неверный логин");
@@ -73,7 +73,7 @@ public class UserController {
             allUsers.put(user.getId(), user);
             log.info("обновлена информация о пользователе - {}", user);
             return user;
-        }else{
+        } else {
             log.warn("В UserController при обновлении информации о пользователе передали нового пользователя");
             throw new NothingToUpdate("Такого пользователя нет!");
         }
