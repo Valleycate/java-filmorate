@@ -14,14 +14,14 @@ public class UserControllerTest {
         try {
             User user = null;
             userController.create(user);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ignored) {
         }
         assertEquals(0, userController.findAll().size());
 
         try {
             User user = new User();
             userController.create(user);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ignored) {
         }
         assertEquals(0, userController.findAll().size());
 
@@ -63,7 +63,7 @@ public class UserControllerTest {
             user.setName("Маша");
             user.setBirthday(LocalDate.of(2000, 2, 28));
             userController.create(user);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ignored) {
         }
         assertEquals(1, userController.findAll().size());
 

@@ -14,7 +14,7 @@ public class FilmControllerTest {
         try {
             Film film = null;
             filmController.create(film);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ignored) {
         }
         assertEquals(0, filmController.findAll().size());
 
@@ -76,7 +76,7 @@ public class FilmControllerTest {
             film.setDuration(60);
             film.setReleaseDate(LocalDate.of(1999, 2, 28));
             filmController.create(film);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ignored) {
         }
         assertEquals(1, filmController.findAll().size());
     }
@@ -161,7 +161,7 @@ public class FilmControllerTest {
             film.setReleaseDate(LocalDate.of(1999, 2, 28));
             filmController.create(film);
             filmController.update(film);
-        } catch (RuntimeException e) {
+        } catch (RuntimeException ignored) {
         }
         assertEquals(2, filmController.findAll().size());
     }
