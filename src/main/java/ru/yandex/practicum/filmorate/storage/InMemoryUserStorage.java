@@ -19,8 +19,8 @@ import java.util.Map;
 @Component
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
-    static private Map<Integer, User> allUsers = new HashMap<>();
-    static private Integer idUser = 0;
+    static Map<Integer, User> allUsers = new HashMap<>();
+    static Integer idUser = 0;
 
     public Collection<User> findAll() {
         log.info("Текущее количество пользователей: {}", allUsers.size());
