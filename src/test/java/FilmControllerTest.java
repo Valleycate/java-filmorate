@@ -19,23 +19,23 @@ public class FilmControllerTest {
             filmController.create(film);
         } catch (RuntimeException ignored) {
         }
-       // assertEquals(0, filmController.findAll().size());
+        // assertEquals(0, filmController.findAll().size());
 
         try {
             Film film = new Film();
             filmController.create(film);
         } catch (RuntimeException ignored) {
         }
-       // assertEquals(0, filmController.findAll().size());
+        // assertEquals(0, filmController.findAll().size());
 
         try {
             Film film = new Film();
             film.setName(" ");
             filmController.create(film);
         } catch (RuntimeException e) {
-          //  assertEquals("Неверное имя", e.getMessage());
+            //  assertEquals("Неверное имя", e.getMessage());
         }
-       // assertEquals(0, filmController.findAll().size());
+        // assertEquals(0, filmController.findAll().size());
 
         try {
             Film film = new Film();
@@ -56,9 +56,9 @@ public class FilmControllerTest {
             film.setDuration(-10);
             filmController.create(film);
         } catch (RuntimeException e) {
-      //      assertEquals("Продолжительность фильма должна быть положительной", e.getMessage());
+            //      assertEquals("Продолжительность фильма должна быть положительной", e.getMessage());
         }
-      //  assertEquals(0, filmController.findAll().size());
+        //  assertEquals(0, filmController.findAll().size());
 
         try {
             Film film = new Film();
@@ -68,9 +68,9 @@ public class FilmControllerTest {
             film.setReleaseDate(LocalDate.of(1894, 2, 28));
             filmController.create(film);
         } catch (RuntimeException e) {
-       //     assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года", e.getMessage());
+            //     assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года", e.getMessage());
         }
-       // assertEquals(0, filmController.findAll().size());
+        // assertEquals(0, filmController.findAll().size());
 
         try {
             Film film = new Film();
@@ -81,7 +81,7 @@ public class FilmControllerTest {
             filmController.create(film);
         } catch (RuntimeException ignored) {
         }
-     //   assertEquals(1, filmController.findAll().size());
+        //   assertEquals(1, filmController.findAll().size());
     }
 
     @Test

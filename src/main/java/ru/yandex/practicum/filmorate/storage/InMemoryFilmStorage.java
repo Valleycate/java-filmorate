@@ -2,9 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import ru.yandex.practicum.filmorate.exceptions.*;
+import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.exceptions.validationException.*;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -42,6 +41,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.warn("findFilmById - фильм не найден; все фильмы - {}", findAll());
         throw new NonexistentException("Фильма с таким id нет");
     }
+
     public Film create(@Valid @RequestBody Film film) {
 
         if (film.getName() == null || film.getName().isEmpty() || film.getName().isBlank()) {
