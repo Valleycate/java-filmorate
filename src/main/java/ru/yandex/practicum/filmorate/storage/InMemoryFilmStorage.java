@@ -17,7 +17,7 @@ import java.util.Map;
 @Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
     static private final Map<Integer, Film> allFilms = new HashMap<>();
-    static Integer idFilm = 0;
+    static private Integer idFilm = 0;
 
     public Collection<Film> findAll() {
         log.info("Текущее количество фильмов: {}", allFilms.size());
