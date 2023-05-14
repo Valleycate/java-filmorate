@@ -14,7 +14,7 @@ public class UserControllerTest {
     @Test
     public void shouldCreateUser() {
         userController = new UserController(new UserService(new InMemoryUserStorage()));
-        if (userController.findAll().size() != 0){
+        if (userController.findAll().size() != 0) {
             userController.findAll().clear();
         }
         try {
