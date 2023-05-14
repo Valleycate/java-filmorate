@@ -13,6 +13,10 @@ public class UserControllerTest {
 
     @Test
     public void shouldCreateUser() {
+        userController = new UserController(new UserService(new InMemoryUserStorage()));
+        if (userController.findAll().size() != 0){
+            userController.findAll().clear();
+        }
         try {
             User user = null;
             userController.create(user);

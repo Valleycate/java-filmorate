@@ -56,7 +56,7 @@ public class FilmControllerTest {
             film.setDuration(-10);
             filmController.create(film);
         } catch (RuntimeException e) {
-            //      assertEquals("Продолжительность фильма должна быть положительной", e.getMessage());
+            // assertEquals("Продолжительность фильма должна быть положительной", e.getMessage());
         }
         //  assertEquals(0, filmController.findAll().size());
 
