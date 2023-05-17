@@ -9,11 +9,11 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserControllerTest {
-    UserController userController = new UserController(new UserService(new InMemoryUserStorage()));
+    private UserController userController = new UserController(new InMemoryUserStorage(), new UserService(new InMemoryUserStorage()));
 
     @Test
     public void shouldCreateUser() {
-        userController = new UserController(new UserService(new InMemoryUserStorage()));
+        userController = new UserController(new InMemoryUserStorage(), new UserService(new InMemoryUserStorage()));
         if (userController.findAll().size() != 0) {
             userController.findAll().clear();
         }

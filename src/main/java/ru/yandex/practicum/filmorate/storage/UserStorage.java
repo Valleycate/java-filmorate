@@ -7,11 +7,11 @@ import javax.validation.Valid;
 import java.util.Collection;
 
 public interface UserStorage {
-    public Collection<User> findAll();
+    Collection<User> findAll();
 
-    public User create(@Valid @RequestBody User user);
+    User create(@Valid @RequestBody User user);
 
-    public User update(@Valid @RequestBody User user);
+    User update(@Valid @RequestBody User user);
 
-    public User findUserById(String id);
+    User findUserById(int id);
 }

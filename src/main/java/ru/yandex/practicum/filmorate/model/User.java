@@ -20,5 +20,5 @@ public class User {
     private String name;
     @NotNull
     private LocalDate birthday;
-    Set<Integer> friends = new HashSet<>();
+    private Set<Integer> friends = new HashSet<>();
 }

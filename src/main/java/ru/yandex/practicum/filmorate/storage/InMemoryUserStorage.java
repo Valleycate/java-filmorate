@@ -6,29 +6,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidBirthdayException;
 import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidEmailException;
-import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidIdException;
 import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidLoginException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
-    static Map<Integer, User> allUsers = new HashMap<>();
-    static Integer idUser = 0;
+    private Map<Integer, User> allUsers = new HashMap<>();
+    private Integer idUser = 0;
 
-    public Collection<User> findAll() {
+    public List<User> findAll() {
         log.info("Текущее количество пользователей: {}", allUsers.size());
-        return allUsers.values();
+        return new ArrayList<>(allUsers.values());
     }
 
-    public User create(@Valid @RequestBody User user) {
-
+    private void validate(User user) {
         if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
             log.warn("В InMemoryUserStorage при создании пользователя передали неверный логин");
             throw new InvalidLoginException("Неверный логин");
@@ -45,6 +44,10 @@ public class InMemoryUserStorage implements UserStorage {
             log.warn("В InMemoryUserStorage при создании пользователя передали неверную дату рождения");
             throw new InvalidBirthdayException("Дата рождения не может быть в будущем");
         }
+    }
+
+    public User create(@Valid @RequestBody User user) {
+        validate(user);
         idUser = idUser + 1;
         allUsers.put(idUser, user);
         user.setId(idUser);
@@ -54,21 +57,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     public User update(@Valid @RequestBody User user) {
         if (user != null && allUsers.containsKey(user.getId())) {
-            if (user.getLogin() == null || user.getLogin().isEmpty() || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-                log.warn("В InMemoryUserStorage при обновлении информации о пользователе передали неверный логин");
-                throw new InvalidLoginException("Неверный логин");
-            }
-            if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            if (user.getEmail() == null || user.getEmail().isEmpty() || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-                log.warn("В InMemoryUserStorage при обновлении информации о пользователе передали неверный адрес электронной почты");
-                throw new InvalidEmailException("Неверный адрес электронной почты");
-            }
-            if (user.getBirthday().isAfter(LocalDate.now())) {
-                log.warn("В InMemoryUserStorage при создании пользователя передали неверную дату рождения");
-                throw new InvalidBirthdayException("Дата рождения не может быть в будущем");
-            }
+            validate(user);
             allUsers.put(user.getId(), user);
             log.info("обновлена информация о пользователе - {}", user);
             return user;
@@ -78,16 +67,9 @@ public class InMemoryUserStorage implements UserStorage {
         }
     }
 
-    public User findUserById(String id) {
-        Integer userId;
-        try {
-            userId = Integer.parseInt(id);
-        } catch (NumberFormatException e) {
-            log.warn("findUserById - id не число");
-            throw new InvalidIdException("Id должно быть числом");
-        }
+    public User findUserById(int id) {
         for (User user : findAll()) {
-            if (user.getId() == userId) {
+            if (user.getId() == id) {
                 return user;
             }
         }

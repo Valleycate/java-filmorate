@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -8,22 +8,19 @@ import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 
 @RestController
+@RequiredArgsConstructor
 public class FilmController {
-    private InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
-    public FilmService filmService;
 
-    @Autowired
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
-    }
+    private final InMemoryFilmStorage filmStorage;
+    private final FilmService filmService;
 
     @GetMapping("/films")
-    public Collection<Film> findAll() {
-        return filmStorage.findAll();
+    public List<Film> findAll() {
+        return new ArrayList<>(filmStorage.findAll());
     }
 
     @PostMapping("/films")
@@ -37,22 +34,22 @@ public class FilmController {
     }
 
     @GetMapping("/films/{id}")
-    public Film findFilmById(@PathVariable String id) {
+    public Film findFilmById(@PathVariable Integer id) {
         return filmStorage.findFilmById(id);
     }
 
     @PutMapping("/films/{id}/like/{userId}")
-    public void addLike(@PathVariable Integer userId, @PathVariable() String id) {
+    public void addLike(@PathVariable Integer userId, @PathVariable() Integer id) {
         filmService.addLike(userId, findFilmById(id));
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
-    public void deleteLike(@PathVariable Integer userId, @PathVariable() String id) {
+    public void deleteLike(@PathVariable Integer userId, @PathVariable() Integer id) {
         filmService.deleteLike(userId, findFilmById(id));
     }
 
     @GetMapping("/films/popular")
-    public ArrayList<Film> findTop10Films(@RequestParam(required = false, defaultValue = "10") Integer count) {
+    public List<Film> findTop10Films(@RequestParam(required = false, defaultValue = "10") Integer count) {
         return filmService.findTop10Films(count);
     }
 }

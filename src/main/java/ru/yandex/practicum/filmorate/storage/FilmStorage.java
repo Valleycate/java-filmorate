@@ -7,11 +7,11 @@ import javax.validation.Valid;
 import java.util.Collection;
 
 public interface FilmStorage {
-    public Collection<Film> findAll();
+    Collection<Film> findAll();
 
-    public Film create(@Valid @RequestBody Film film);
+    Film create(@Valid @RequestBody Film film);
 
-    public Film update(@Valid @RequestBody Film film);
+    Film update(@Valid @RequestBody Film film);
 
-    public Film findFilmById(String id);
+    Film findFilmById(int id);
 }
