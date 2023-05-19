@@ -5,4 +5,8 @@ public class NonexistentException extends RuntimeException {
         super(message);
     }
 
+    public NonexistentException() {
+        super();
+    }
+
 }

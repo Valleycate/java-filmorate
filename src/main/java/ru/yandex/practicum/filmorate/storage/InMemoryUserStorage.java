@@ -11,15 +11,12 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
 public class InMemoryUserStorage implements UserStorage {
-    private Map<Integer, User> allUsers = new HashMap<>();
+    private final Map<Integer, User> allUsers = new HashMap<>();
     private Integer idUser = 0;
 
     public List<User> findAll() {
@@ -68,13 +65,15 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public User findUserById(int id) {
-        for (User user : findAll()) {
-            if (user.getId() == id) {
-                return user;
-            }
+        Optional<User> optionalUser = allUsers.values().stream()
+                .filter(u -> u.getId() == id)
+                .findFirst();
+        if (optionalUser.isPresent()) {
+            return optionalUser.get();
+        } else {
+            log.warn("findUserById - пользователь не найден; все пользователи - {}", findAll());
+            throw new NonexistentException("Пользователя с таким id нет");
         }
-        log.warn("findUserById - пользователь не найден; все пользователи - {}", findAll());
-        throw new NonexistentException("Пользователя с таким id нет");
     }
 
 }

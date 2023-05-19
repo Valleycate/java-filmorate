@@ -4,10 +4,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
 
 public interface UserStorage {
-    Collection<User> findAll();
+    List<User> findAll();
 
     User create(@Valid @RequestBody User user);
 
