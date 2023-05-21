@@ -1,83 +1,55 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @RestController
-@Slf4j
+@RequiredArgsConstructor
 public class FilmController {
-    private Map<Integer, Film> allFilms = new HashMap();
-    Integer idFilm = 0;
+
+    private final InMemoryFilmStorage filmStorage;
+    private final FilmService filmService;
 
     @GetMapping("/films")
-    public Collection<Film> findAll() {
-        log.info("Текущее количество фильмов: {}", allFilms.size());
-        return allFilms.values();
+    public List<Film> findAll() {
+        return new ArrayList<>(filmStorage.findAll());
     }
 
     @PostMapping("/films")
     public Film create(@Valid @RequestBody Film film) {
-
-        if (film.getName() == null || film.getName().isEmpty() || film.getName().isBlank()) {
-            log.warn("В FilmController при создании фильма передали неверное имя");
-            throw new InvalidNameException("Неверное имя");
-        }
-
-        if (film.getDescription().length() > 200) {
-            log.warn("В FilmController при создании фильма передали описание превышаюшее 200 символов");
-            throw new InvalidDescriptionException("Описание слишком большое");
-        }
-        if (film.getDuration() == null || film.getDuration() < 0) {
-            log.warn("В FilmController при создании фильма передали отрицательную продолжительность фильма");
-            throw new InvalidDurationException("Продолжительность фильма должна быть положительной");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.warn("В FilmController при создании фильма передали дату релиза, которая находиться раньше 28 декабря 1895 года");
-            throw new InvalidReleaseDateException("Дата релиза не может быть раньше 28 декабря 1895 года");
-        }
-        idFilm = idFilm + 1;
-        allFilms.put(idFilm, film);
-        film.setId(idFilm);
-        log.info("добавлен фильм - {}", film);
-        return film;
+        return filmStorage.create(film);
     }
 
     @PutMapping("/films")
     public Film update(@Valid @RequestBody Film film) {
-        if (film != null && allFilms.containsKey(film.getId())) {
-            if (film.getName() == null || film.getName().isEmpty() || film.getName().isBlank()) {
-                log.warn("В FilmController при обновлении информации о фильме передали неверное имя");
-                throw new InvalidNameException("Неверное имя");
-            }
+        return filmStorage.update(film);
+    }
 
-            if (film.getDescription().length() > 200) {
-                log.warn("В FilmController при обновлении информации о фильме передали описание превышаюшее 200 символов");
-                throw new InvalidDescriptionException("Описание слишком большое");
-            }
-            if (film.getDuration() == null || film.getDuration() < 0) {
-                log.warn("В FilmController при обновлении информации о фильме передали отрицательную продолжительность фильма");
-                throw new InvalidDurationException("Продолжительность фильма должна быть положительной");
-            }
-            if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-                log.warn("В FilmController при обновлении информации о фильме передали дату релиза, " +
-                        "которая находиться раньше 28 декабря 1895 года");
-                throw new InvalidReleaseDateException("Дата релиза не может быть раньше 28 декабря 1895 года");
-            }
-            allFilms.put(film.getId(), film);
-            log.info("обновлена информация о фильме - {}", film);
-            return film;
-        } else {
-            log.warn("В FilmController при обновлении информации о фильме передали новый фильм");
-            throw new NothingToUpdate("Такого фильма нет!");
-        }
+    @GetMapping("/films/{id}")
+    public Film findFilmById(@PathVariable Integer id) {
+        return filmStorage.findFilmById(id);
+    }
+
+    @PutMapping("/films/{id}/like/{userId}")
+    public void addLike(@PathVariable Integer userId, @PathVariable() Integer id) {
+        filmService.addLike(userId, findFilmById(id));
+    }
+
+    @DeleteMapping("/films/{id}/like/{userId}")
+    public void deleteLike(@PathVariable Integer userId, @PathVariable() Integer id) {
+        filmService.deleteLike(userId, findFilmById(id));
+    }
+
+    @GetMapping("/films/popular")
+    public List<Film> findTop10Films(@RequestParam(required = false, defaultValue = "10") Integer count) {
+        return filmService.findTop10Films(count);
     }
 }

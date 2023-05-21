@@ -5,6 +5,8 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class Film {
@@ -17,4 +19,5 @@ public class Film {
     private LocalDate releaseDate;
     @NotNull
     private Integer duration;
+    private Set<Integer> likes = new HashSet<>(); //у пользователя(id) есть возможность поставить лайк(true), или удалить
 }
