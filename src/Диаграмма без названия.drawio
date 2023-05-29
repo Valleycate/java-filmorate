@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-05-29T15:15:24.575Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" etag="Ig9VYMXAHoPY9A5lUwpK" version="21.3.5" type="github">
+<mxfile host="app.diagrams.net" modified="2023-05-29T15:16:21.017Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" etag="7IxGCI1mpKhiAt5AX55G" version="21.3.5" type="github">
   <diagram name="Страница 1" id="-rF7jukU0bKkgXjfipod">
     <mxGraphModel dx="1434" dy="796" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -239,7 +239,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="3eWFEVwyNzmcaty5VmGP-82" value="Film_genre" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;whiteSpace=wrap;" vertex="1" parent="1">
-          <mxGeometry x="360" y="50" width="180" height="90" as="geometry" />
+          <mxGeometry x="380" y="50" width="180" height="90" as="geometry" />
         </mxCell>
         <mxCell id="3eWFEVwyNzmcaty5VmGP-86" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;html=1;" vertex="1" parent="3eWFEVwyNzmcaty5VmGP-82">
           <mxGeometry y="30" width="180" height="30" as="geometry" />
@@ -274,7 +274,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="3eWFEVwyNzmcaty5VmGP-102" value="MPA" style="shape=table;startSize=30;container=1;collapsible=1;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=center;resizeLast=1;html=1;" vertex="1" parent="1">
-          <mxGeometry x="130" y="210" width="180" height="90" as="geometry" />
+          <mxGeometry x="120" y="210" width="180" height="90" as="geometry" />
         </mxCell>
         <mxCell id="3eWFEVwyNzmcaty5VmGP-103" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=1;" vertex="1" parent="3eWFEVwyNzmcaty5VmGP-102">
           <mxGeometry y="30" width="180" height="30" as="geometry" />
