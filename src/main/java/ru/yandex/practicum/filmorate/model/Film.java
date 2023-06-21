@@ -21,6 +21,6 @@ public class Film {
     @NotNull
     private Integer duration;
     private Set<Integer> likes = new HashSet<>();
-    private ArrayList<Genre> genreFilm;
-    private МРА rating;
+    private ArrayList<GenreModel> genres;
+    private MpaModel mpa;
 }

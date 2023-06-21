@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
-import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidIdException;
+import ru.yandex.practicum.filmorate.exceptions.validationException.BadRequest;
+import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.UserDbStorage;
 
 import java.util.List;
 import java.util.Set;
@@ -16,7 +17,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
-    private final UserStorage userStorage;
+    private final UserDbStorage userStorage;
 
     public void addFriend(User user, Integer friendId) {
         if (friendId >= 0) {
@@ -24,15 +25,27 @@ public class UserService {
                     .filter(u -> u.getId() == friendId)
                     .findFirst()
                     .orElseThrow(NonexistentException::new);
-            friend.getFriends().add(user.getId());
             user.getFriends().add(friend.getId());
+            if(friend.getFriendship().get(user.getId()) == Friendship.UNCONFIRMED){
+                user.getFriendship().put(friend.getId(), Friendship.CONFIRMED);
+                friend.getFriendship().put(user.getId(), Friendship.CONFIRMED);
+            }else {
+                user.getFriendship().put(friend.getId(), Friendship.UNCONFIRMED);
+            }
+            userStorage.update(user);
         } else {
-            throw new InvalidIdException("Id друга не положительное");
+            throw new BadRequest("Id друга не положительное");
         }
     }
 
     public void deleteFriend(User user, Integer friendId) {
         user.getFriends().remove(friendId);
+        user.getFriendship().remove(friendId);
+        userStorage.deleteFriend(user.getId(), friendId);
+        userStorage.findUserById(friendId).getFriends().remove(user.getId());
+        userStorage.findUserById(friendId).getFriendship().remove(user.getId());
+        userStorage.deleteFriend(friendId, user.getId());
+
     }
 
     public List<User> findMutualFriends(User friend, User anotherFriend) {

@@ -23,18 +23,22 @@ public class FilmService {
         userStorage.findUserById(userId);
         log.info("Поставлен лайк фильму {}", film);
         film.getLikes().add(userId);
+        filmStorage.update(film);
     }
 
     public void deleteLike(Integer userId, Film film) {
         userStorage.findUserById(userId);
-        log.info("Поставлен лайк фильму {}", film);
-        film.getLikes().remove(userId);
+        if (film.getLikes().contains(userId)) {
+            film.getLikes().remove(userId);
+            log.info("Удалён лайк фильму {}", film);
+            filmStorage.update(film);
+        }
     }
 
     public List<Film> findTop10Films(int count) {
         return filmStorage.findAll().stream()
                 .sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
-                        .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
+                        .thenComparing(Film::getId, Comparator.reverseOrder())
                 )
                 .limit(count).collect(Collectors.toList());
     }

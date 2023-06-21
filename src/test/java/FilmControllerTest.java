@@ -1,7 +1,9 @@
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.DAO.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
@@ -10,7 +12,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FilmControllerTest {
-    private final FilmController filmController = new FilmController(new InMemoryFilmStorage(),
+    private final FilmController filmController = new FilmController(new FilmDbStorage(new JdbcTemplate()),
             new FilmService(new InMemoryUserStorage(), new InMemoryFilmStorage()));
 
     @Test

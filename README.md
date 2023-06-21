@@ -1,7 +1,7 @@
 # java-filmorate
 * это схема БД Filmorate
 
-![БД filmorate.png](src/БД filmorate.png)
+![БД filmorate.png](src/БД%20Filmorate.png)
 
 Пример запроса
 ```sql
