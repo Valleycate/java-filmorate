@@ -22,5 +22,5 @@ public class User {
     @NotNull
     private LocalDate birthday;
     private Set<Integer> friends = new HashSet<>();
-    private Map<Integer,Friendship> friendship;
+    private Map<Integer, Friendship> friendship;
 }

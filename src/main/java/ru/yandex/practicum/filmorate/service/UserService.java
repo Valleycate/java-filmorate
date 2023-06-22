@@ -26,10 +26,10 @@ public class UserService {
                     .findFirst()
                     .orElseThrow(NonexistentException::new);
             user.getFriends().add(friend.getId());
-            if(friend.getFriendship().get(user.getId()) == Friendship.UNCONFIRMED){
+            if (friend.getFriendship().get(user.getId()) == Friendship.UNCONFIRMED) {
                 user.getFriendship().put(friend.getId(), Friendship.CONFIRMED);
                 friend.getFriendship().put(user.getId(), Friendship.CONFIRMED);
-            }else {
+            } else {
                 user.getFriendship().put(friend.getId(), Friendship.UNCONFIRMED);
             }
             userStorage.update(user);

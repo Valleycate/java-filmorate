@@ -1,7 +1,5 @@
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
@@ -9,46 +7,46 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class UserControllerTest {
-    private UserController userController = new UserController(new InMemoryUserStorage(), new UserService(new InMemoryUserStorage()));
+    private InMemoryUserStorage userStorage = new InMemoryUserStorage();
 
     @Test
     public void shouldCreateUser() {
-        userController = new UserController(new InMemoryUserStorage(), new UserService(new InMemoryUserStorage()));
-        if (userController.findAll().size() != 0) {
-            userController.findAll().clear();
+        userStorage = new InMemoryUserStorage();
+        if (userStorage.findAll().size() != 0) {
+            userStorage.findAll().clear();
         }
         try {
             User user = null;
-            userController.create(user);
+            userStorage.create(user);
         } catch (RuntimeException ignored) {
         }
-        assertEquals(0, userController.findAll().size());
+        assertEquals(0, userStorage.findAll().size());
 
         try {
             User user = new User();
-            userController.create(user);
+            userStorage.create(user);
         } catch (RuntimeException ignored) {
         }
-        assertEquals(0, userController.findAll().size());
+        assertEquals(0, userStorage.findAll().size());
 
         try {
             User user = new User();
             user.setLogin(" ");
-            userController.create(user);
+            userStorage.create(user);
         } catch (RuntimeException e) {
             assertEquals("Неверный логин", e.getMessage());
         }
-        assertEquals(0, userController.findAll().size());
+        assertEquals(0, userStorage.findAll().size());
 
         try {
             User user = new User();
             user.setLogin("Anim");
             user.setEmail("Email.com");
-            userController.create(user);
+            userStorage.create(user);
         } catch (RuntimeException e) {
             assertEquals("Неверный адрес электронной почты", e.getMessage());
         }
-        assertEquals(0, userController.findAll().size());
+        assertEquals(0, userStorage.findAll().size());
 
         try {
             User user = new User();
@@ -56,11 +54,11 @@ public class UserControllerTest {
             user.setEmail("Email.com@Anim");
             user.setName("Маша");
             user.setBirthday(LocalDate.of(2222, 2, 28));
-            userController.create(user);
+            userStorage.create(user);
         } catch (RuntimeException e) {
             assertEquals("Дата рождения не может быть в будущем", e.getMessage());
         }
-        assertEquals(0, userController.findAll().size());
+        assertEquals(0, userStorage.findAll().size());
 
         try {
             User user = new User();
@@ -68,20 +66,20 @@ public class UserControllerTest {
             user.setEmail("Email.com@Anim");
             user.setName("Маша");
             user.setBirthday(LocalDate.of(2000, 2, 28));
-            userController.create(user);
+            userStorage.create(user);
         } catch (RuntimeException ignored) {
         }
-        assertEquals(1, userController.findAll().size());
+        assertEquals(1, userStorage.findAll().size());
 
         User user = new User();
         user.setLogin("Anim");
         user.setEmail("Email.com@Anim");
         user.setName("");
         user.setBirthday(LocalDate.of(2000, 2, 28));
-        userController.create(user);
+        userStorage.create(user);
         assertEquals("Anim", user.getName());
 
-        assertEquals(2, userController.findAll().size());
+        assertEquals(2, userStorage.findAll().size());
     }
 
     @Test
@@ -91,43 +89,43 @@ public class UserControllerTest {
         newUser.setEmail("Email.com@Anim");
         newUser.setName("Маша");
         newUser.setBirthday(LocalDate.of(2000, 2, 28));
-        userController.create(newUser);
+        userStorage.create(newUser);
         try {
             User user = null;
-            userController.update(user);
+            userStorage.update(user);
         } catch (RuntimeException e) {
             assertEquals("Такого пользователя нет!", e.getMessage());
         }
-        assertEquals(1, userController.findAll().size());
+        assertEquals(1, userStorage.findAll().size());
 
         try {
             User user = new User();
-            userController.update(user);
+            userStorage.update(user);
         } catch (RuntimeException e) {
             assertEquals("Такого пользователя нет!", e.getMessage());
         }
-        assertEquals(1, userController.findAll().size());
+        assertEquals(1, userStorage.findAll().size());
 
         try {
             User user = new User();
             user.setId(newUser.getId());
             user.setLogin(" ");
-            userController.update(user);
+            userStorage.update(user);
         } catch (RuntimeException e) {
             assertEquals("Неверный логин", e.getMessage());
         }
-        assertEquals(1, userController.findAll().size());
+        assertEquals(1, userStorage.findAll().size());
 
         try {
             User user = new User();
             user.setId(newUser.getId());
             user.setLogin("Anim");
             user.setEmail("Email.com");
-            userController.update(user);
+            userStorage.update(user);
         } catch (RuntimeException e) {
             assertEquals("Неверный адрес электронной почты", e.getMessage());
         }
-        assertEquals(1, userController.findAll().size());
+        assertEquals(1, userStorage.findAll().size());
 
         try {
             User user = new User();
@@ -136,11 +134,11 @@ public class UserControllerTest {
             user.setEmail("Email.com@Anim");
             user.setName("Маша");
             user.setBirthday(LocalDate.of(2222, 2, 28));
-            userController.update(user);
+            userStorage.update(user);
         } catch (RuntimeException e) {
             assertEquals("Дата рождения не может быть в будущем", e.getMessage());
         }
-        assertEquals(1, userController.findAll().size());
+        assertEquals(1, userStorage.findAll().size());
 
         try {
             User user = new User();
@@ -149,21 +147,21 @@ public class UserControllerTest {
             user.setEmail("Email.com@Anim");
             user.setName("Маша");
             user.setBirthday(LocalDate.of(2000, 2, 28));
-            userController.update(user);
+            userStorage.update(user);
         } catch (RuntimeException ignored) {
         }
-        assertEquals(1, userController.findAll().size());
+        assertEquals(1, userStorage.findAll().size());
 
         User user = new User();
         user.setLogin("Anim");
         user.setEmail("Email.com@Anim");
         user.setName("");
         user.setBirthday(LocalDate.of(2000, 2, 28));
-        userController.create(user);
-        userController.update(user);
+        userStorage.create(user);
+        userStorage.update(user);
         assertEquals("Anim", user.getName());
 
-        assertEquals(2, userController.findAll().size());
+        assertEquals(2, userStorage.findAll().size());
     }
 
 }

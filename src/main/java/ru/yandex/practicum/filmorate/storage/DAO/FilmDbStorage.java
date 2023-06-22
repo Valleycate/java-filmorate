@@ -18,7 +18,10 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 @Repository
 @Component
@@ -79,7 +82,7 @@ public class FilmDbStorage implements FilmStorage {
         List<Integer> genreId = genreToId(film.getGenres());
         idFilm = idFilm + 1;
         film.setId(idFilm);
-        jdbcTemplate.update("  INSERT INTO Film (id, name, description, release_date, duration, rating_id)" +
+        jdbcTemplate.update("INSERT INTO Film (id, name, description, release_date, duration, rating_id)" +
                 "VALUES(?,?,?,CAST(? AS date),?,?);", film.getId(), film.getName(), film.getDescription(), film.getReleaseDate().toString(), film.getDuration(), ratingId);
         for (Integer id : film.getLikes()) {
             jdbcTemplate.update("INSERT INTO Likes (film_id, user_id) VALUES(?,?);", film.getId(), id);
@@ -112,12 +115,12 @@ public class FilmDbStorage implements FilmStorage {
         if (genreId != null) {
             List<Integer> iteration = new ArrayList<>();
             jdbcTemplate.update("DELETE FROM FILM_GENRE WHERE film_id =?;", film.getId());
-            for (int i =0; i < genreId.size(); i++) {
+            for (int i = 0; i < genreId.size(); i++) {
                 Integer id = genreId.get(i);
-                if(!iteration.contains(id)) {
+                if (!iteration.contains(id)) {
                     jdbcTemplate.update("INSERT INTO Film_genre (film_id, genre_id) VALUES(?,?);", film.getId(), id);
                     iteration.add(id);
-                }else{
+                } else {
                     film.getGenres().remove(i);
                 }
             }
@@ -238,12 +241,12 @@ public class FilmDbStorage implements FilmStorage {
                 model.setName("R");
             } else if (ratingId == 5) {
                 model.setName("NC-17");
-            }else{
-                throw  new NonexistentException("Такого рейтинга нет!");
+            } else {
+                throw new NonexistentException("Такого рейтинга нет!");
             }
             return model;
         }
-        throw  new NonexistentException("Такого рейтинга нет!");
+        throw new NonexistentException("Такого рейтинга нет!");
     }
 
     private Genre stringToGenre(String genre) {
@@ -284,7 +287,7 @@ public class FilmDbStorage implements FilmStorage {
         } else if (id == 6) {
             genre.setName(Genre.Боевик);
         } else {
-            throw  new NonexistentException("Такого жанра нет!");
+            throw new NonexistentException("Такого жанра нет!");
         }
         return genre;
     }

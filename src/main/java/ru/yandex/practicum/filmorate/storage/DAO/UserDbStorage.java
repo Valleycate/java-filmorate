@@ -94,11 +94,11 @@ public class UserDbStorage implements UserStorage {
                     jdbcTemplate.update("INSERT INTO Friendship (user_id,friend_id,name) VALUES(?,?,?);",
                             user.getId(), friendId, user.getFriendship().get(friendId).toString());
                 } else {
-                    if(jdbcTemplate.queryForList("select friend_id from Friendship" +
-                            " where friend_id = ? AND user_id = ?;",friendId, user.getId()).isEmpty()){
+                    if (jdbcTemplate.queryForList("select friend_id from Friendship" +
+                            " where friend_id = ? AND user_id = ?;", friendId, user.getId()).isEmpty()) {
                         jdbcTemplate.update("INSERT INTO Friendship (user_id,friend_id,name) VALUES(?,?,?);",
                                 user.getId(), friendId, user.getFriendship().get(friendId).toString());
-                    }else {
+                    } else {
                         jdbcTemplate.update("UPDATE Friendship SET name=? WHERE friend_id = ? AND user_id =?;",
                                 user.getFriendship().get(friendId).toString(), friendId, user.getId());
                     }
@@ -109,7 +109,7 @@ public class UserDbStorage implements UserStorage {
 
     }
 
-    public void deleteFriend(Integer id, Integer friendId){
+    public void deleteFriend(Integer id, Integer friendId) {
         try {
             findUserById(id);
             findUserById(friendId);
@@ -117,7 +117,7 @@ public class UserDbStorage implements UserStorage {
             throw new BadRequest("такого пользователя нет в базе данных");
         }
         if (!jdbcTemplate.queryForList("select friend_id from Friendship" +
-                " where user_id = ?;", id).isEmpty()){
+                " where user_id = ?;", id).isEmpty()) {
             jdbcTemplate.update("DELETE From FRIENDSHIP WHERE user_id = ? And friend_id = ?", id, friendId);
         }
     }

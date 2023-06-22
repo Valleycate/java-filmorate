@@ -1,19 +1,16 @@
 import org.junit.jupiter.api.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.DAO.FilmDbStorage;
+import ru.yandex.practicum.filmorate.model.GenreModel;
+import ru.yandex.practicum.filmorate.model.MpaModel;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FilmControllerTest {
-    private final FilmController filmController = new FilmController(new FilmDbStorage(new JdbcTemplate()),
-            new FilmService(new InMemoryUserStorage(), new InMemoryFilmStorage()));
+    private final InMemoryFilmStorage filmController = new InMemoryFilmStorage();
 
     @Test
     public void shouldCreateFilm() {
@@ -69,6 +66,11 @@ public class FilmControllerTest {
             film.setDescription("Мелодрамма");
             film.setDuration(60);
             film.setReleaseDate(LocalDate.of(1894, 2, 28));
+            MpaModel m = new MpaModel();
+            m.setId(1);
+            film.setMpa(m);
+            ArrayList<GenreModel> genres = new ArrayList<>();
+            film.setGenres(genres);
             filmController.create(film);
         } catch (RuntimeException e) {
             assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года", e.getMessage());
@@ -90,10 +92,16 @@ public class FilmControllerTest {
     @Test
     public void shouldUpdateFilm() {
         Film newFilm = new Film();
+        newFilm.setId(1);
         newFilm.setName("Титаник");
         newFilm.setDescription("Мелодрамма");
         newFilm.setDuration(60);
-        newFilm.setReleaseDate(LocalDate.of(1999, 2, 28));
+        newFilm.setReleaseDate(LocalDate.of(1967, 03, 25));
+        MpaModel m = new MpaModel();
+        m.setId(1);
+        newFilm.setMpa(m);
+        ArrayList<GenreModel> genres = new ArrayList<>();
+        newFilm.setGenres(genres);
         filmController.create(newFilm);
         try {
             Film film = null;
