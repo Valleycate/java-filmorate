@@ -50,7 +50,7 @@ public class FilmDbStorage implements FilmStorage {
             obj.setDescription((String) map.get("description"));
             obj.setReleaseDate(Date.valueOf(map.get("release_date").toString()).toLocalDate());
             obj.setDuration((Integer) map.get("duration"));
-            obj.setMpa(IdtoRating((Integer) map.get("rating_id")));
+            obj.setMpa(idToRating((Integer) map.get("rating_id")));
             List<Map<String, Object>> rowsGenre = jdbcTemplate.queryForList("select genre_id " +
                     "from Film_genre " +
                     "where film_id = ?;", obj.getId());
@@ -184,7 +184,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setDescription(filmRows.getString("description"));
         film.setReleaseDate(filmRows.getDate("release_date").toLocalDate());
         film.setDuration(filmRows.getInt("duration"));
-        film.setMpa(IdtoRating(filmRows.getInt("rating_id")));
+        film.setMpa(idToRating(filmRows.getInt("rating_id")));
         return film;
     }
 
@@ -227,7 +227,7 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-    private MpaModel IdtoRating(Integer ratingId) {
+    private MpaModel idToRating(Integer ratingId) {
         MpaModel model = new MpaModel();
         if (ratingId != null) {
             model.setId(ratingId);
@@ -268,7 +268,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public MpaModel getMpaById(Integer id) {
-        return IdtoRating(id);
+        return idToRating(id);
     }
 
     public GenreModel getGenresById(Integer id) {
