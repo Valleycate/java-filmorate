@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS MPA(
      id INTEGER PRIMARY KEY,
-     name varchar(4)
+     name varchar(5)
 );
 
 CREATE TABLE IF NOT EXISTS Film (
