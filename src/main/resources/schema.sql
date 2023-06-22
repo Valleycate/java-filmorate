@@ -1,3 +1,8 @@
+CREATE TABLE IF NOT EXISTS MPA(
+     id INTEGER PRIMARY KEY,
+     name varchar(4)
+);
+
 CREATE TABLE IF NOT EXISTS Film (
     	id INTEGER PRIMARY KEY,
     	name varchar(100) NOT NULL,
@@ -26,18 +31,12 @@ CREATE TABLE IF NOT EXISTS Likes(
     user_id INTEGER REFERENCES Users (id)
 );
 
-CREATE TABLE IF NOT EXISTS MPA(
+CREATE TABLE IF NOT EXISTS Genre(
      id INTEGER PRIMARY KEY,
-     name varchar(4)
+     name varchar(14)
 );
 
 CREATE TABLE IF NOT EXISTS Film_genre(
      film_id INTEGER REFERENCES Film (id),
      genre_id INTEGER REFERENCES Genre (id)
-);
-
-
-CREATE TABLE IF NOT EXISTS Genre(
-     id INTEGER PRIMARY KEY,
-     name varchar(14)
 );
