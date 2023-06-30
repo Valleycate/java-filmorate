@@ -13,6 +13,21 @@ public class FilmControllerTest {
     private final InMemoryFilmStorage filmController = new InMemoryFilmStorage();
 
     @Test
+    public void shouldNotCreateFilm() {
+        Film film = new Film();
+        film.setName("Титаник");
+        film.setDescription("Мелодрамма");
+        film.setDuration(60);
+        film.setReleaseDate(LocalDate.of(1894, 2, 28));
+        MpaModel m = new MpaModel();
+        m.setId(1);
+        film.setMpa(m);
+        ArrayList<GenreModel> genres = new ArrayList<>();
+        film.setGenres(genres);
+        //f.create(film);
+    }
+
+    @Test
     public void shouldCreateFilm() {
         try {
             Film film = null;

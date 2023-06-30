@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.exceptions.validationException.BadRequest;
@@ -17,7 +18,24 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class UserService {
+    @Autowired
     private final UserDbStorage userStorage;
+
+    public List<User> findAll() {
+        return userStorage.findAll();
+    }
+
+    public User create(User user) {
+        return userStorage.create(user);
+    }
+
+    public User update(User user) {
+        return userStorage.update(user);
+    }
+
+    public User findUserById(int id) {
+        return userStorage.findUserById(id);
+    }
 
     public void addFriend(User user, Integer friendId) {
         if (friendId >= 0) {

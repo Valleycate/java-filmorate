@@ -72,12 +72,12 @@ public class UserControllerTest {
         assertEquals(1, userStorage.findAll().size());
 
         User user = new User();
-        user.setLogin("Anim");
-        user.setEmail("Email.com@Anim");
-        user.setName("");
+        user.setLogin("some_login");
+        user.setEmail("Email.com@Someone");
+        user.setName("some_name");
         user.setBirthday(LocalDate.of(2000, 2, 28));
         userStorage.create(user);
-        assertEquals("Anim", user.getName());
+        assertEquals("some_name", user.getName());
 
         assertEquals(2, userStorage.findAll().size());
     }
