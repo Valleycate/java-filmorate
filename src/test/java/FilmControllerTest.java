@@ -3,7 +3,6 @@ import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidRelea
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.GenreModel;
 import ru.yandex.practicum.filmorate.model.MpaModel;
-import ru.yandex.practicum.filmorate.storage.DAO.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
@@ -29,7 +28,7 @@ public class FilmControllerTest {
         film.setGenres(genres);
         try {
             f.create(film);
-        }catch(InvalidReleaseDateException e){
+        } catch (InvalidReleaseDateException e) {
             assertEquals(f.findAll().size(), 0);
         }
     }
