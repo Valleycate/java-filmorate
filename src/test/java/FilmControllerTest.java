@@ -1,7 +1,9 @@
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidReleaseDateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.GenreModel;
 import ru.yandex.practicum.filmorate.model.MpaModel;
+import ru.yandex.practicum.filmorate.storage.DAO.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
@@ -15,6 +17,7 @@ public class FilmControllerTest {
     @Test
     public void shouldNotCreateFilm() {
         Film film = new Film();
+        InMemoryFilmStorage f = new InMemoryFilmStorage();
         film.setName("Титаник");
         film.setDescription("Мелодрамма");
         film.setDuration(60);
@@ -24,7 +27,11 @@ public class FilmControllerTest {
         film.setMpa(m);
         ArrayList<GenreModel> genres = new ArrayList<>();
         film.setGenres(genres);
-        //f.create(film);
+        try {
+            f.create(film);
+        }catch(InvalidReleaseDateException e){
+            assertEquals(f.findAll().size(), 0);
+        }
     }
 
     @Test
