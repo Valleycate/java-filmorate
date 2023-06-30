@@ -60,10 +60,4 @@ public class UserController {
     public List<User> findMutualFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
         return userService.findMutualFriends(findUserById(id), findUserById(otherId));
     }
-
-    public void valid(User user) {
-        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
-
-        }
-    }
 }
