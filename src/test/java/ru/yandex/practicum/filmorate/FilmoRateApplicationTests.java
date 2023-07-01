@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class FilmoRateApplicationTests {
+public class FilmoRateApplicationTests {
     private final UserDbStorage userStorage;
     private final UserService userService;
     private final FilmDbStorage filmDbStorage;
