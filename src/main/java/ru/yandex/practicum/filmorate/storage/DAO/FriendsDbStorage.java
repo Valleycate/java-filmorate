@@ -13,7 +13,6 @@ import java.util.Map;
 @Repository
 @RequiredArgsConstructor
 public class FriendsDbStorage {
-    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
     public Map<Integer, Friendship> findFriendship(int userId) {

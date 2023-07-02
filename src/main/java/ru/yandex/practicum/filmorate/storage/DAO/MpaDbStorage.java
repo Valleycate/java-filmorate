@@ -15,7 +15,6 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class MpaDbStorage {
-    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
     public MpaModel getMpaModel(int id) {

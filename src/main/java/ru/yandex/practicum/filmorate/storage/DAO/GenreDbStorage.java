@@ -15,7 +15,6 @@ import java.util.*;
 @Repository
 @RequiredArgsConstructor
 public class GenreDbStorage {
-    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
     protected ArrayList<GenreModel> updateGenre(ArrayList<GenreModel> genreFilm, int filmId) {

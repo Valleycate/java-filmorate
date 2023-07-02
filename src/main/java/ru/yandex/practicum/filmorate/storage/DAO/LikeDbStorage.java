@@ -13,7 +13,6 @@ import java.util.Set;
 @Repository
 @RequiredArgsConstructor
 public class LikeDbStorage {
-    @Autowired
     private final JdbcTemplate jdbcTemplate;
 
     protected void updateLikes(Set<Integer> likes, int filmId) {
