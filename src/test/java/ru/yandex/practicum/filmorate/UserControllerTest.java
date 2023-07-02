@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 public class UserControllerTest {
     private final UserDbStorage userStorage;
     private final UserService userService;
+
     public User createUser() {
         User user = new User();
         user.setLogin("some_login");
