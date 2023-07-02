@@ -20,6 +20,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -37,6 +38,7 @@ public class FilmControllerTest {
         user.setBirthday(LocalDate.of(2000, 2, 28));
         return userStorage.create(user);
     }
+
     public Film createFilm() {
         Film film = new Film();
         film.setName("Титаник");

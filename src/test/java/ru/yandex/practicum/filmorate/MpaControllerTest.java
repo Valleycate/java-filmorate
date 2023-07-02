@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.MpaModel;
 import ru.yandex.practicum.filmorate.storage.DAO.MpaDbStorage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)

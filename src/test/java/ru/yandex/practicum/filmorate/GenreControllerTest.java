@@ -9,11 +9,13 @@ import ru.yandex.practicum.filmorate.model.GenreModel;
 import ru.yandex.practicum.filmorate.storage.DAO.GenreDbStorage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GenreControllerTest {
     private final GenreDbStorage genreDbStorage;
+
     @Test
     public void testGetAllGenres() {
         assertEquals(genreDbStorage.findAllGenre().size(), 6);
