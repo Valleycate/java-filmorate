@@ -18,17 +18,36 @@ public class FilmService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
+    public List<Film> findAll() {
+        return filmStorage.findAll();
+    }
+
+    public Film create(Film film) {
+        return filmStorage.create(film);
+    }
+
+    public Film update(Film film) {
+        return filmStorage.update(film);
+    }
+
+    public Film findFilmById(int id) {
+        return filmStorage.findFilmById(id);
+    }
 
     public void addLike(Integer userId, Film film) {
         userStorage.findUserById(userId);
         log.info("Поставлен лайк фильму {}", film);
         film.getLikes().add(userId);
+        filmStorage.update(film);
     }
 
     public void deleteLike(Integer userId, Film film) {
         userStorage.findUserById(userId);
-        log.info("Поставлен лайк фильму {}", film);
-        film.getLikes().remove(userId);
+        if (film.getLikes().contains(userId)) {
+            film.getLikes().remove(userId);
+            log.info("Удалён лайк фильму {}", film);
+            filmStorage.update(film);
+        }
     }
 
     public List<Film> findTop10Films(int count) {
