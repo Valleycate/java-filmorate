@@ -23,13 +23,13 @@ public class UserController {
         return new ArrayList<>(userService.findAll());
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping()
     public User create(@Valid @RequestBody User user) {
         user.validateName();
         return userService.create(user);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @PutMapping()
     public User update(@Valid @RequestBody User user) {
         user.validateName();
         return userService.update(user);

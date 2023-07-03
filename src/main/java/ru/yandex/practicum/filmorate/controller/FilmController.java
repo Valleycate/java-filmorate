@@ -18,17 +18,17 @@ import java.util.List;
 public class FilmController {
     private final FilmService filmService;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping()
     public List<Film> findAll() {
         return new ArrayList<>(filmService.findAll());
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping()
     public Film create(@Valid @RequestBody Film film) {
         return filmService.create(film);
     }
 
-    @RequestMapping(method = RequestMethod.PUT)
+    @PutMapping()
     public Film update(@Valid @RequestBody Film film) {
         return filmService.update(film);
     }
