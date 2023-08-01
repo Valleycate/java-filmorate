@@ -14,4 +14,6 @@ public interface UserStorage {
     User update(@Valid @RequestBody User user);
 
     User findUserById(int id);
+
+    User deleteById(Integer id);
 }

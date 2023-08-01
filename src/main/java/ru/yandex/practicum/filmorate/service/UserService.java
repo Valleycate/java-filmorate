@@ -78,4 +78,15 @@ public class UserService {
                 .map(userStorage::findUserById)
                 .collect(Collectors.toList());
     }
+
+
+    public void deleteById(Integer id) {
+        if (id <= 0) {
+            throw new NonexistentException("incorect if for delete user");
+        }
+        if (userStorage.findUserById(id) == null) {
+            throw new NonexistentException("user not exist with current id");
+        }
+       userStorage.deleteById(id);
+    }
 }

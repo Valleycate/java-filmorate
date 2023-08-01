@@ -21,14 +21,28 @@ CREATE TABLE IF NOT EXISTS Users(
 );
 
 CREATE TABLE IF NOT EXISTS Friendship(
-    user_id INTEGER REFERENCES Users (id),
-    friend_id INTEGER REFERENCES Users (id),
-    name varchar(11)
+    user_id INTEGER NOT NULL,
+    friend_id INTEGER NOT NULL,
+    name varchar(11),
+    PRIMARY KEY (friend_id, user_id),
+    FOREIGN KEY (user_id)
+        REFERENCES USERS (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (friend_id)
+        REFERENCES USERS (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Likes(
-    film_id INTEGER REFERENCES Film (id),
-    user_id INTEGER REFERENCES Users (id)
+    film_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    PRIMARY KEY (film_id, user_id),
+    FOREIGN KEY (user_id)
+        REFERENCES USERS (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (film_id)
+        REFERENCES FILM (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS Genre(
@@ -37,8 +51,16 @@ CREATE TABLE IF NOT EXISTS Genre(
 );
 
 CREATE TABLE IF NOT EXISTS Film_genre(
-     film_id INTEGER REFERENCES Film (id),
-     genre_id INTEGER REFERENCES Genre (id)
+     film_id INTEGER NOT NULL,
+     genre_id INTEGER NOT NULL ,
+     PRIMARY KEY (film_id, genre_id),
+     FOREIGN KEY (film_id)
+         REFERENCES FILM (id)
+         ON DELETE CASCADE,
+     FOREIGN KEY (genre_id)
+         REFERENCES GENRE (id)
+         ON DELETE CASCADE
+
 );
 
 create table if not exists Review

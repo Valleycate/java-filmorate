@@ -92,7 +92,6 @@ public class UserDbStorage implements UserStorage {
         if (userRows.next()) {
             User user = makeUser(userRows);
             Map<Integer, Friendship> friendship = friendsDbStorage.findFriendship(id);
-            ;
             Set<Integer> friends = new HashSet<>(friendship.keySet());
             user.setFriends(friends);
             user.setFriendship(friendship);
@@ -100,6 +99,16 @@ public class UserDbStorage implements UserStorage {
         } else {
             throw new BadRequest("нет пользователя с таким id");
         }
+    }
+
+    @Override
+    public User deleteById(Integer id) {
+        User user = findUserById(id);
+        if (!jdbcTemplate.queryForList("select ID from USERS" +
+                " where ID = ?;", id).isEmpty()) {
+            jdbcTemplate.update("DELETE From USERS WHERE ID = ? ", id);
+        }
+        return user;
     }
 
     private User makeUser(SqlRowSet userRows) {
