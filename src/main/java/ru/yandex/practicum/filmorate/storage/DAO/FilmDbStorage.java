@@ -113,4 +113,14 @@ public class FilmDbStorage implements FilmStorage {
         film.setMpa(mpaDbStorage.getMpaModel(filmRows.getInt("rating_id")));
         return film;
     }
+    @Override
+    public Film deleteById(Integer id) {
+        Film film = findFilmById(id);
+        if (!jdbcTemplate.queryForList("select id from FILM" +
+                " where id = ?;", id).isEmpty()) {
+            jdbcTemplate.update("DELETE From Film WHERE id = ?", id);
+        }
+        // cascade delete join-table
+        return film;
+    }
 }

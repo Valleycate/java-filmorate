@@ -59,4 +59,10 @@ public class UserController {
     public List<User> findMutualFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
         return userService.findMutualFriends(findUserById(id), findUserById(otherId));
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable Integer id) {
+        userService.deleteById(id);
+    }
+
 }

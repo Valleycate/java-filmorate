@@ -52,5 +52,11 @@ public class FilmController {
     public List<Film> findTop10Films(@RequestParam(required = false, defaultValue = "10") Integer count) {
         return filmService.findTop10Films(count);
     }
+
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable("id") Integer id) {
+        log.info("A movie delete from database");
+        filmService.deleteById(id);
+    }
 }
 
