@@ -19,10 +19,7 @@ public class User {
     private String email;
     @NotBlank
     private String login;
-    //@BlankName(login)
-    private String name;//была ещё попытка name = login,
-    // но из-за того что передают "" вместо name,
-    // такой вариант не работает
+    private String name;
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
