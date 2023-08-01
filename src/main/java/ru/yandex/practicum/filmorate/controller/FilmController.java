@@ -19,6 +19,7 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
     private final FilmService filmService;
+
     @GetMapping()
     public List<Film> findAll() {
         return new ArrayList<>(filmService.findAll());
@@ -33,9 +34,10 @@ public class FilmController {
     public Film update(@Valid @RequestBody Film film) {
         return filmService.update(film);
     }
+
     @GetMapping("/common")
     public List<Film> findMutualFilm(@RequestParam Integer userId, @RequestParam Integer friendId) {
-        return filmService.findMutualFilms(userId,friendId);
+        return filmService.findMutualFilms(userId, friendId);
     }
 
     @GetMapping("/common")
@@ -55,7 +57,7 @@ public class FilmController {
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Integer userId, @PathVariable() Integer id) {
-         filmService.deleteLike(userId, findFilmById(id));
+        filmService.deleteLike(userId, findFilmById(id));
     }
 
     @GetMapping("/popular")
