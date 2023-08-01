@@ -31,4 +31,5 @@ public class User {
         this.birthday = birthday;
         this.name = name;
     }
+
 }
