@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS feed(
     event_id INTEGER,
     user_id INTEGER REFERENCES Users (id),
     entity_id INTEGER,
-    event_type ENUM("FRIEND", "REVIEW", "LIKE"),
-    operation ENUM("ADD", "REMOVE", "UPDATE"),
+    event_type varchar(6),
+    operation varchar(6),
     feed_time TIMESTAMP
 );
