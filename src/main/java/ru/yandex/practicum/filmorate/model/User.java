@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class User {
     @EqualsAndHashCode.Exclude
     private int id;
+    @Pattern(regexp = "\\S+",message = "login with whitespaces")
     @NotBlank(message = "Please provide a login")
     private String login;
     private String name;
