@@ -32,12 +32,6 @@ public class BasicErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ExceptionResponse handleNotFoundException(final NotFoundException e) {
-        return new ExceptionResponse("Искомый объект не найден");
-    }
-
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         Map<String, String> errors = new HashMap<>();
