@@ -43,6 +43,9 @@ public class FilmService {
     }
 
     public void deleteLike(Integer userId, Film film) {
+        if (userStorage.findUserById(userId) == null) {
+            throw new NonexistentException("user not exist with current id");
+        }
         userStorage.findUserById(userId);
         if (film.getLikes().contains(userId)) {
             film.getLikes().remove(userId);

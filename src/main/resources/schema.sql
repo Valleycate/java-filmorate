@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS Film (
 );
 
 CREATE TABLE IF NOT EXISTS Users(
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY  AUTO_INCREMENT,
     name varchar(100),
     email varchar(100) NOT NULL,
     login varchar(100) NOT NULL,
@@ -23,7 +23,6 @@ CREATE TABLE IF NOT EXISTS Users(
 CREATE TABLE IF NOT EXISTS Friendship(
     user_id INTEGER NOT NULL,
     friend_id INTEGER NOT NULL,
-    name varchar(11),
     PRIMARY KEY (friend_id, user_id),
     FOREIGN KEY (user_id)
         REFERENCES USERS (id)
@@ -60,7 +59,6 @@ CREATE TABLE IF NOT EXISTS Film_genre(
      FOREIGN KEY (genre_id)
          REFERENCES GENRE (id)
          ON DELETE CASCADE
-
 );
 
 create table if not exists Review

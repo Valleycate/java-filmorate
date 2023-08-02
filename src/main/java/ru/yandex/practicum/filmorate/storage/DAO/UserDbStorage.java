@@ -1,125 +1,121 @@
 package ru.yandex.practicum.filmorate.storage.DAO;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exceptions.validationException.BadRequest;
-import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidIdException;
-import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-
-import javax.sql.DataSource;
-import java.sql.Date;
 import java.util.*;
 
 
 @Repository
-@Primary
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
-    private static Integer idUser = 0;
-    private final JdbcTemplate jdbcTemplate;
-    FriendsDbStorage friendsDbStorage;
-
-    @Autowired
-    public UserDbStorage(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        friendsDbStorage = new FriendsDbStorage(jdbcTemplate);
-    }
+    private final NamedParameterJdbcOperations jdbcOperations;
+    private final UserRowMapper userRowMapper;
 
     public List<User> findAll() {
-        String userRows = "select * from Users;";
-        List<User> users = new ArrayList<>();
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(userRows);
-        for (Map<String, Object> row : rows) {
-            User obj = new User();
-            obj.setId((Integer) row.get("id"));
-            obj.setName((String) row.get("name"));
-            obj.setLogin((String) row.get("login"));
-            obj.setEmail((String) row.get("email"));
-            obj.setBirthday(Date.valueOf(row.get("birthday").toString()).toLocalDate());
-            Map<Integer, Friendship> friendship = friendsDbStorage.findFriendship(obj.getId());
-            Set<Integer> friends = new HashSet<>(friendship.keySet());
-            obj.setFriends(friends);
-            obj.setFriendship(friendship);
-            users.add(obj);
-        }
-        if (!users.isEmpty()) {
-            return users;
-        } else {
-            throw new BadRequest("нет пользователей");
-        }
+        final String sqlQuery = "select ID, NAME, LOGIN, EMAIL, BIRTHDAY from USERS ";
+        return jdbcOperations.query(sqlQuery, userRowMapper);
     }
 
     public User create(User user) {
-        idUser = idUser + 1;
-        user.setId(idUser);
-        jdbcTemplate.update("INSERT INTO Users (id,name, email, login, birthday) VALUES(?,?,?,?,CAST(? AS date));",
-                user.getId(), user.getName(), user.getEmail(), user.getLogin(), user.getBirthday());
-        friendsDbStorage.updateFriendship(user.getFriendship(), user.getId());
+        String sqlQuery = "insert into USERS (EMAIL, LOGIN, NAME, BIRTHDAY)" +
+                " values (:email, :login, :name, :birthday)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("email", user.getEmail());
+        map.addValue("login", user.getLogin());
+        map.addValue("name", user.getName());
+        map.addValue("birthday", user.getBirthday());
+        jdbcOperations.update(sqlQuery, map, keyHolder);
+        user.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
         return user;
     }
 
     public User update(User user) {
-        try {
-            findUserById(user.getId());
-        } catch (InvalidIdException e) {
-            throw new BadRequest("такого пользователя нет в базе данных");
-        }
-        jdbcTemplate.update("UPDATE Users SET name=? WHERE id =?;", user.getName(), user.getId());
-        jdbcTemplate.update("UPDATE Users SET email=? WHERE id =?;", user.getEmail(), user.getId());
-        jdbcTemplate.update("UPDATE Users SET login=? WHERE id =?;", user.getLogin(), user.getId());
-        jdbcTemplate.update("UPDATE Users SET birthday=CAST(? AS date) WHERE id =?;", user.getBirthday().toString(), user.getId());
-        friendsDbStorage.updateFriendship(user.getFriendship(), user.getId());
+        String sqlQuery = "UPDATE USERS SET LOGIN = :login, NAME = :name, EMAIL = :email, BIRTHDAY = :birthday" +
+                " WHERE ID = :userId";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("email", user.getEmail());
+        map.addValue("login", user.getLogin());
+        map.addValue("name", user.getName());
+        map.addValue("birthday", user.getBirthday());
+        map.addValue("userId", user.getId());
+        jdbcOperations.update(sqlQuery, map);
         return user;
-
     }
 
     public void deleteFriend(Integer id, Integer friendId) {
-        try {
-            findUserById(id);
-            findUserById(friendId);
-        } catch (InvalidIdException e) {
-            throw new BadRequest("такого пользователя нет в базе данных");
-        }
-        friendsDbStorage.deleteFriends(id, friendId);
+        final String sqlQuery = "DELETE FROM FRIENDSHIP WHERE USER_ID = :userId AND FRIEND_Id = :frienId ";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", id);
+        map.addValue("frienId", friendId);
+        jdbcOperations.update(sqlQuery, map);
     }
 
     public User findUserById(int id) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from Users where id = ?;", id);
-        if (userRows.next()) {
-            User user = makeUser(userRows);
-            Map<Integer, Friendship> friendship = friendsDbStorage.findFriendship(id);
-            Set<Integer> friends = new HashSet<>(friendship.keySet());
-            user.setFriends(friends);
-            user.setFriendship(friendship);
-            return user;
-        } else {
-            throw new BadRequest("нет пользователя с таким id");
+        final String sqlQuery = "select ID, LOGIN, BIRTHDAY, EMAIL, NAME " +
+                "from USERS " +
+                "where ID = :userId ";
+        final List<User> users = jdbcOperations.query(sqlQuery, Map.of("userId", id), userRowMapper);
+
+        if (users.size() != 1) {
+            return null; // Optional.empty();
         }
+        return users.get(0);
     }
 
     @Override
     public User deleteById(Integer id) {
         User user = findUserById(id);
-        if (!jdbcTemplate.queryForList("select ID from USERS" +
-                " where ID = ?;", id).isEmpty()) {
-            jdbcTemplate.update("DELETE From USERS WHERE ID = ? ", id);
-        }
+        String sqlQuery = "DELETE FROM USERS WHERE ID = :userId";
+        jdbcOperations.update(sqlQuery, Map.of("userId", id));
         return user;
     }
 
-    private User makeUser(SqlRowSet userRows) {
-        User user = new User();
-        user.setId(userRows.getInt("id"));
-        user.setName(userRows.getString("name"));
-        user.setLogin(userRows.getString("login"));
-        user.setEmail(userRows.getString("email"));
-        user.setBirthday((userRows.getDate("birthday").toLocalDate()));
-        return user;
+    @Override
+    public void addFriend(User user, User friend) {
+        final String sqlQuery = "INSERT INTO FRIENDSHIP (USER_ID, FRIEND_ID) " +
+                "VALUES (:userId, :frienId)";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", user.getId());
+        map.addValue("frienId", friend.getId());
+        jdbcOperations.update(sqlQuery, map);
     }
 
+    @Override
+    public void deleteFriend(User user, User friend) {
+        final String sqlQuery = "DELETE FROM FRIENDSHIP WHERE USER_ID = :userId AND FRIEND_Id = :frienId ";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("userId", user.getId());
+        map.addValue("frienId", friend.getId());
+        jdbcOperations.update(sqlQuery, map);
+    }
 
+    @Override
+    public List<User> allFriends(User user) {
+        final String sqlQuery = "SELECT ID, NAME, LOGIN, BIRTHDAY,EMAIL FROM USERS" +
+                " WHERE ID IN (" +
+                "SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID = :userId" +
+                ")";
+        return jdbcOperations.query(sqlQuery, Map.of("userId", user.getId()), userRowMapper);
+    }
+
+    @Override
+    public List<User> getCommonFriends(int userId, int friendId) {
+        final String sqlQuery = "SELECT ID, NAME, LOGIN, BIRTHDAY,EMAIL FROM USERS" +
+                " WHERE ID IN (" +
+                " SELECT F1.FRIEND_ID FROM FRIENDSHIP AS F1" +
+                " INNER JOIN FRIENDSHIP AS F2 ON F1.FRIEND_ID = F2.FRIEND_ID" +
+                "  WHERE F1.USER_ID = :USERID AND F2.USER_ID = :FRIENDID" +
+                "    )";
+        MapSqlParameterSource map = new MapSqlParameterSource();
+        map.addValue("USERID", userId);
+        map.addValue("FRIENDID", friendId);
+        return jdbcOperations.query(sqlQuery, map, userRowMapper);
+    }
 }
