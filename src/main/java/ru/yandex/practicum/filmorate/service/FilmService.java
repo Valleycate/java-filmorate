@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
@@ -42,6 +43,9 @@ public class FilmService {
     }
 
     public void deleteLike(Integer userId, Film film) {
+        if (userStorage.findUserById(userId) == null) {
+            throw new NonexistentException("user not exist with current id");
+        }
         userStorage.findUserById(userId);
         if (film.getLikes().contains(userId)) {
             film.getLikes().remove(userId);
@@ -56,5 +60,13 @@ public class FilmService {
                         .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
                 )
                 .limit(count).collect(Collectors.toList());
+    }
+
+
+    public void deleteById(Integer id) {
+        if (filmStorage.findFilmById(id) == null) {
+            throw new NonexistentException("Film by id  not exist");
+        }
+        filmStorage.deleteById(id);
     }
 }
