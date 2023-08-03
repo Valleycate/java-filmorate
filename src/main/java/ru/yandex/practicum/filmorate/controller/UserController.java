@@ -26,7 +26,7 @@ public class UserController {
 
     @PostMapping()
     public User create(@Valid @RequestBody User user) {
-       return userService.create(user);
+        return userService.create(user);
     }
 
     @PutMapping()
@@ -38,6 +38,7 @@ public class UserController {
     public User findUserById(@PathVariable Integer id) {
         return userService.findUserById(id);
     }
+
     @GetMapping("/{id}/recommendations")
     public List<Film> recommendation(@PathVariable Integer id) {
         return userService.recommendations(id);

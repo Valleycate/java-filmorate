@@ -77,7 +77,8 @@ public class FilmService {
         }
         filmStorage.deleteById(id);
     }
-    public List<Film> recommendations(int userId, int friendId){
+
+    public List<Film> recommendations(int userId, int friendId) {
         return filmStorage.recommendations(userId, friendId);
     }
 }

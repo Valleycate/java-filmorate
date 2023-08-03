@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.DAO.UserDbStorage;
+
 import java.util.List;
 
 
@@ -74,7 +75,7 @@ public class UserService {
         if (userStorage.findUserById(id) == null) {
             throw new NonexistentException("user not exist with current id");
         }
-       return userStorage.deleteById(id);
+        return userStorage.deleteById(id);
     }
 
     private static void checkNameUser(User user) {
@@ -82,13 +83,14 @@ public class UserService {
             user.setName(user.getLogin());
         }
     }
-    public List<Film> recommendations(int userId){
+
+    public List<Film> recommendations(int userId) {
         findUserById(userId);
         int id = userId;
         int max = 0;
-        for (User user : userStorage.findAll()){
-            int size = filmService.findMutualFilms(userId,user.getId()).size();
-            if(size > max){
+        for (User user : userStorage.findAll()) {
+            int size = filmService.findMutualFilms(userId, user.getId()).size();
+            if (size > max) {
                 id = user.getId();
                 max = size;
             }
