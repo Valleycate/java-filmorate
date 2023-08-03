@@ -300,6 +300,7 @@ public class FilmDbStorage implements FilmStorage {
         }
         return films;
     }
+
     public List<Film> recommendations(int userId, int friendId) {
         List<Film> films = new ArrayList<>();
         List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT *\n" +
