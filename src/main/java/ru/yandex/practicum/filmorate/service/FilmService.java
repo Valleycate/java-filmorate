@@ -101,6 +101,8 @@ public class FilmService {
         filmStorage.deleteById(id);
     }
 
+    public List<Film> recommendations(int userId, int friendId) {
+
     public List<Film> sortedFilmsOfDirector(int directorId, String param) {
         if (directorDbStorage.getDirector(directorId) != null) {
             switch (param) {

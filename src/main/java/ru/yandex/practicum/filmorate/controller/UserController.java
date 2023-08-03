@@ -40,6 +40,7 @@ public class UserController {
     public User findUserById(@PathVariable Integer id) {
         return userService.findUserById(id);
     }
+
     @GetMapping("/{id}/recommendations")
     public List<Film> recommendation(@PathVariable Integer id) {
         return userService.recommendations(id);

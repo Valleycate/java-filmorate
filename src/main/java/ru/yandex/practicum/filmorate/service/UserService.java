@@ -131,12 +131,14 @@ public class UserService {
         return feedStorage.findUsersFeed(userId);
     }
     public List<Film> recommendations(int userId){
+
+    public List<Film> recommendations(int userId) {
         findUserById(userId);
         int id = userId;
         int max = 0;
-        for (User user : userStorage.findAll()){
-            int size = filmService.findMutualFilms(userId,user.getId()).size();
-            if(size > max){
+        for (User user : userStorage.findAll()) {
+            int size = filmService.findMutualFilms(userId, user.getId()).size();
+            if (size > max) {
                 id = user.getId();
                 max = size;
             }
