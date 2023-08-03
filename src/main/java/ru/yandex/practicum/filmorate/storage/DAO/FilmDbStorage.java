@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.DAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.validationException.BadRequest;
@@ -13,6 +14,8 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.sql.DataSource;
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +27,6 @@ public class FilmDbStorage implements FilmStorage {
     private final GenreDbStorage genreDbStorage;
     private final LikeDbStorage likeDbStorage;
     private final MpaDbStorage mpaDbStorage;
-    private Integer idFilm = 0;
 
     @Autowired
     public FilmDbStorage(DataSource dataSource) {
@@ -63,12 +65,28 @@ public class FilmDbStorage implements FilmStorage {
         } else {
             ratingId = rating.getId();
         }
-        idFilm = idFilm + 1;
-        film.setId(idFilm);
-        jdbcTemplate.update("INSERT INTO Film (id, name, description, release_date, duration, rating_id)" +
-                "VALUES(?,?,?,CAST(? AS date),?,?);", film.getId(), film.getName(), film.getDescription(), film.getReleaseDate().toString(), film.getDuration(), ratingId);
+
+        String sql = "INSERT INTO Film (name, description, release_date, duration, rating_id)" +
+                "VALUES(?,?,CAST(? AS date),?,?);";
+
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection
+                    .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, film.getName());
+            ps.setString(2, film.getDescription());
+            ps.setDate(3, Date.valueOf(film.getReleaseDate()));
+            ps.setInt(4, film.getDuration());
+            ps.setObject(5, ratingId);
+            return ps;
+        }, keyHolder);
+
+        int key = (int) keyHolder.getKey();
+        film.setId(key);
         likeDbStorage.updateLikes(film.getLikes(), film.getId());
         genreDbStorage.updateGenre(film.getGenres(), film.getId());
+        film.setMpa(mpaDbStorage.getMpaModel(film.getMpa().getId()));
+        film.setGenres(genreDbStorage.getGenresFilm(film.getId()));
         return film;
     }
 
@@ -87,6 +105,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update("UPDATE Film SET rating_id=? WHERE id =?;", ratingId, film.getId());
         likeDbStorage.updateLikes(film.getLikes(), film.getId());
         film.setGenres(genreDbStorage.updateGenre(film.getGenres(), film.getId()));
+        film.setMpa(mpaDbStorage.getMpaModel(film.getMpa().getId()));
         return film;
     }
 

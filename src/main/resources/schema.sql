@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS MPA(
 );
 
 CREATE TABLE IF NOT EXISTS Film (
-    	id INTEGER PRIMARY KEY,
+    	id INTEGER PRIMARY KEY AUTO_INCREMENT,
     	name varchar(100) NOT NULL,
     	description varchar(200) NOT NULL,
     	release_date date NOT NULL,
