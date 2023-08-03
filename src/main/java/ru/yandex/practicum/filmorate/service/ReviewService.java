@@ -19,14 +19,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ReviewService {
     private final ReviewDbStorage reviewStorage;
-    private final UserStorage userStorage;
+    private final UserService userService;
     private final FilmStorage filmStorage;
     private final ReviewLikeDbStorage reviewLikeStorage;
 
 
-    public ReviewService(ReviewDbStorage reviewStorage, UserService userService, FilmService filmService, UserStorage userStorage, FilmStorage filmStorage, ReviewLikeDbStorage reviewLikeStorage) {
+    public ReviewService(ReviewDbStorage reviewStorage, UserService userService, FilmService filmService, UserStorage userStorage, UserService userService1, FilmStorage filmStorage, ReviewLikeDbStorage reviewLikeStorage) {
         this.reviewStorage = reviewStorage;
-        this.userStorage = userStorage;
+        this.userService = userService1;
         this.filmStorage = filmStorage;
         this.reviewLikeStorage = reviewLikeStorage;
     }
@@ -62,7 +62,7 @@ public class ReviewService {
 
     public Review saveReview(Review review) {
         //проверка что айди фильма и юзера существуют
-        userStorage.findUserById(review.getUserId());
+        userService.findUserById(review.getUserId());
         filmStorage.findFilmById(review.getFilmId());
         enrichReviewsByUseful(review);
         Review savedReview = reviewStorage.saveReview(review);
@@ -113,7 +113,7 @@ public class ReviewService {
 
     public void addLikeDislike(Long reviewId, int userId, Boolean isLike) {
         findReviewById(reviewId);
-        userStorage.findUserById(userId);
+        userService.findUserById(userId);
         List<Integer> whoLikeReview = reviewLikeStorage.whoLikeReview(reviewId);
         List<Integer> whoDislikeReview = reviewLikeStorage.whoDislikeReview(reviewId);
         if (isLike) { //прилетел лайк
@@ -142,7 +142,7 @@ public class ReviewService {
 
     public void deleteLikeDislike(Long reviewId, int userId, Boolean isLike) {
         findReviewById(reviewId);
-        userStorage.findUserById(userId);
+        userService.findUserById(userId);
         //при удалении лайка/дизлайка, которого нет, ничего не происходит, ошибка не выдаётся
         if (isLike) {
             log.info("Пользователь id = : " + userId + " удалил like отзыву id = " + reviewId);
