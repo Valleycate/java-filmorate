@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Feed;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
@@ -128,5 +129,18 @@ public class UserService {
     public List<Feed> getFeed(Integer userId) {
         findUserById(userId);
         return feedStorage.findUsersFeed(userId);
+    }
+    public List<Film> recommendations(int userId){
+        findUserById(userId);
+        int id = userId;
+        int max = 0;
+        for (User user : userStorage.findAll()){
+            int size = filmService.findMutualFilms(userId,user.getId()).size();
+            if(size > max){
+                id = user.getId();
+                max = size;
+            }
+        }
+        return filmService.recommendations(userId, id);
     }
 }
