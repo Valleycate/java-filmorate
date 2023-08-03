@@ -114,27 +114,38 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    public List<Film> findMutualFilms(int userId, int friendId) {
-        List<Film> films = new ArrayList<>();
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT  *\n" +
-                "FROM (SELECT  *\n" +
-                "\tFROM FILM \n" +
-                "\tINNER JOIN LIKES ON FILM.id = LIKES.film_id\n" +
-                "\tWHERE LIKES.user_id = ? ) AS t\n" +
-                "INNER JOIN LIKES ON t.id = LIKES.film_id\n" +
-                "WHERE LIKES.user_id = ?;", userId, friendId);
-        for (Map<String, Object> map : rows) {
-            Film obj = new Film();
-            obj.setId((Integer) map.get("id"));
-            obj.setName((String) map.get("name"));
-            obj.setDescription((String) map.get("description"));
-            obj.setReleaseDate(Date.valueOf(map.get("release_date").toString()).toLocalDate());
-            obj.setDuration((Integer) map.get("duration"));
-            obj.setMpa(mpaDbStorage.getMpaModel((Integer) map.get("rating_id")));
-            obj.setGenres(genreDbStorage.getGenresFilm(obj.getId()));
-            obj.setLikes(likeDbStorage.getLikes(obj.getId()));
-            films.add(obj);
+    @Override
+    public Film deleteById(Integer id) {
+        Film film = findFilmById(id);
+        if (!jdbcTemplate.queryForList("select id from FILM" +
+                " where id = ?;", id).isEmpty()) {
+            jdbcTemplate.update("DELETE From Film WHERE id = ?", id);
         }
-        return films;
+        // cascade delete join-table
+        return film;
     }
-}
+
+        public List<Film> findMutualFilms ( int userId, int friendId){
+            List<Film> films = new ArrayList<>();
+            List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT  *\n" +
+                    "FROM (SELECT  *\n" +
+                    "\tFROM FILM \n" +
+                    "\tINNER JOIN LIKES ON FILM.id = LIKES.film_id\n" +
+                    "\tWHERE LIKES.user_id = ? ) AS t\n" +
+                    "INNER JOIN LIKES ON t.id = LIKES.film_id\n" +
+                    "WHERE LIKES.user_id = ?;", userId, friendId);
+            for (Map<String, Object> map : rows) {
+                Film obj = new Film();
+                obj.setId((Integer) map.get("id"));
+                obj.setName((String) map.get("name"));
+                obj.setDescription((String) map.get("description"));
+                obj.setReleaseDate(Date.valueOf(map.get("release_date").toString()).toLocalDate());
+                obj.setDuration((Integer) map.get("duration"));
+                obj.setMpa(mpaDbStorage.getMpaModel((Integer) map.get("rating_id")));
+                obj.setGenres(genreDbStorage.getGenresFilm(obj.getId()));
+                obj.setLikes(likeDbStorage.getLikes(obj.getId()));
+                films.add(obj);
+            }
+            return films;
+        }
+    }

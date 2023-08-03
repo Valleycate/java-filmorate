@@ -15,5 +15,7 @@ public interface FilmStorage {
 
     Film findFilmById(int id);
 
+    Film deleteById(Integer id);
+
     List<Film> findMutualFilms(int userId, int friendId);
 }
