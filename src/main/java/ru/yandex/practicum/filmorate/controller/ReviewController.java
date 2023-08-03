@@ -31,7 +31,7 @@ public class ReviewController {
 
 
     @DeleteMapping("{reviewId}")
-    public void deleteFilm(@PathVariable("reviewId") Long reviewId) {
+    public void deleteReview(@PathVariable("reviewId") Long reviewId) {
         reviewService.deleteReview(reviewId);
     }
 
