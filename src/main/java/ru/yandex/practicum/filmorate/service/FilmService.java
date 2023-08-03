@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,13 +61,7 @@ public class FilmService {
     public List<Film> findMutualFilms(Integer userId, Integer friendId) {
         userStorage.findUserById(userId);
         userStorage.findUserById(friendId);
-        List<Film> mutualFilms = new ArrayList<>();
-        for (Film film : filmStorage.findAll()) {
-            if (film.getLikes().contains(userId) && film.getLikes().contains(friendId)) {
-                mutualFilms.add(film);
-            }
-        }
-        return mutualFilms.stream().sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
+        return filmStorage.findMutualFilms(userId, friendId).stream().sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
                 .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
         ).collect(Collectors.toList());
     }

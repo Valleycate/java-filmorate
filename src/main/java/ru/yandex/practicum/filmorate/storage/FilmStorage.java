@@ -14,4 +14,6 @@ public interface FilmStorage {
     Film update(@Valid @RequestBody Film film);
 
     Film findFilmById(int id);
+
+    List<Film> findMutualFilms(int userId, int friendId);
 }
