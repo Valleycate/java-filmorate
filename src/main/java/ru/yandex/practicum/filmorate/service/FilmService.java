@@ -77,4 +77,11 @@ public class FilmService {
                 .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
         ).collect(Collectors.toList());
     }
+
+    public void deleteById(Integer id) {
+        if (filmStorage.findFilmById(id) == null) {
+            throw new NonexistentException("Film by id  not exist");
+        }
+        filmStorage.deleteById(id);
+    }
 }
