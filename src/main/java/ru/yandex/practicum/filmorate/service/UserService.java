@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.DAO.UserDbStorage;
+
 import java.util.List;
 
 
@@ -72,7 +73,7 @@ public class UserService {
         if (userStorage.findUserById(id) == null) {
             throw new NonexistentException("user not exist with current id");
         }
-       return userStorage.deleteById(id);
+        return userStorage.deleteById(id);
     }
 
     private static void checkNameUser(User user) {
