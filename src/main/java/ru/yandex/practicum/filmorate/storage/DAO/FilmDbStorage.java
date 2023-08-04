@@ -303,15 +303,13 @@ public class FilmDbStorage implements FilmStorage {
 
     public List<Film> recommendations(int userId, int friendId) {
         List<Film> films = new ArrayList<>();
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT *\n" +
-                "FROM (SELECT  *\n" +
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList("SELECT  *\n" +
                 "\tFROM (SELECT  *\n" +
                 "\t\tFROM FILM \n" +
                 "\t\tINNER JOIN LIKES ON FILM.id = LIKES.film_id\n" +
-                "\t\tWHERE LIKES.user_id = ? ) AS t\n" +
+                "\t\tWHERE LIKES.user_id = ?) AS t\n" +
                 "\tINNER JOIN LIKES ON t.id = LIKES.film_id\n" +
-                "WHERE LIKES.user_id = ?)\n" +
-                "WHERE LIKES.user_id = ?;", userId, friendId, friendId);
+                "\tWHERE LIKES.user_id != ?;",friendId, userId);
         for (Map<String, Object> map : rows) {
             Film obj = new Film();
             obj.setId((Integer) map.get("id"));
