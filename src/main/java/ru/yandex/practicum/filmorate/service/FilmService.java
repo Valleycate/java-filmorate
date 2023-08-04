@@ -62,14 +62,6 @@ public class FilmService {
                 .limit(count).collect(Collectors.toList());
     }
 
-
-    public void deleteById(Integer id) {
-        if (filmStorage.findFilmById(id) == null) {
-            throw new NonexistentException("Film by id  not exist");
-        }
-        filmStorage.deleteById(id);
-    }
-
     public List<Film> findMutualFilms(Integer userId, Integer friendId) {
         userStorage.findUserById(userId);
         userStorage.findUserById(friendId);
