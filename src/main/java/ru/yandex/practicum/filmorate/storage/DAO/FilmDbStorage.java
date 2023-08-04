@@ -176,7 +176,7 @@ public class FilmDbStorage implements FilmStorage {
                 "\t\tINNER JOIN LIKES ON FILM.id = LIKES.film_id\n" +
                 "\t\tWHERE LIKES.user_id = ?) AS t\n" +
                 "\tINNER JOIN LIKES ON t.id = LIKES.film_id\n" +
-                "\tWHERE LIKES.user_id != ?;",friendId, userId);
+                "\tWHERE LIKES.user_id != ?;", friendId, userId);
         for (Map<String, Object> map : rows) {
             Film obj = new Film();
             obj.setId((Integer) map.get("id"));
