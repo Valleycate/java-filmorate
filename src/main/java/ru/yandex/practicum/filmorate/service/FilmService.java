@@ -62,6 +62,13 @@ public class FilmService {
                 .limit(count).collect(Collectors.toList());
     }
 
+    public List<Film> findMutualFilms(Integer userId, Integer friendId) {
+        userStorage.findUserById(userId);
+        userStorage.findUserById(friendId);
+        return filmStorage.findMutualFilms(userId, friendId).stream().sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
+                .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
+        ).collect(Collectors.toList());
+    }
 
     public void deleteById(Integer id) {
         if (filmStorage.findFilmById(id) == null) {
