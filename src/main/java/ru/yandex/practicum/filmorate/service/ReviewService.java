@@ -3,12 +3,17 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.validationException.BadRequest;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
+import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
+import ru.yandex.practicum.filmorate.storage.DAO.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.ReviewDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.ReviewLikeDbStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -22,13 +27,15 @@ public class ReviewService {
     private final UserService userService;
     private final FilmStorage filmStorage;
     private final ReviewLikeDbStorage reviewLikeStorage;
+    private final FeedDbStorage feedStorage;
 
 
-    public ReviewService(ReviewDbStorage reviewStorage, UserService userService, FilmService filmService, UserStorage userStorage, UserService userService1, FilmStorage filmStorage, ReviewLikeDbStorage reviewLikeStorage) {
+    public ReviewService(ReviewDbStorage reviewStorage, UserService userService, FilmService filmService, UserStorage userStorage, UserService userService1, FilmStorage filmStorage, ReviewLikeDbStorage reviewLikeStorage, FeedDbStorage feedStorage) {
         this.reviewStorage = reviewStorage;
         this.userService = userService1;
         this.filmStorage = filmStorage;
         this.reviewLikeStorage = reviewLikeStorage;
+        this.feedStorage = feedStorage;
     }
 
 
@@ -65,8 +72,16 @@ public class ReviewService {
         userService.findUserById(review.getUserId());
         filmStorage.findFilmById(review.getFilmId());
         enrichReviewsByUseful(review);
+
         Review savedReview = reviewStorage.saveReview(review);
         log.info("Добавлен новый отзыв: {}", savedReview);
+        feedStorage.save(Feed.builder()
+                .userId(savedReview.getUserId())
+                .entityId(savedReview.getReviewId())
+                .eventType(EnumEventType.REVIEW)
+                .operation(EnumOperation.ADD)
+                .timestamp(Instant.now().toEpochMilli())
+                .build());
         return savedReview;
 
     }
@@ -77,11 +92,25 @@ public class ReviewService {
         enrichReviewsByUseful(review);
         Review updateReview = reviewStorage.updateReview(review);
         log.info("Отзыв обновлён : {}", updateReview);
+        feedStorage.save(Feed.builder()
+                .userId(updateReview.getUserId())
+                .entityId(updateReview.getReviewId())
+                .eventType(EnumEventType.REVIEW)
+                .operation(EnumOperation.UPDATE)
+                .timestamp(Instant.now().toEpochMilli())
+                .build());
         return updateReview;
     }
 
     public void deleteReview(Long reviewId) {
-        findReviewById(reviewId);
+        Review reviewById = findReviewById(reviewId);
+        feedStorage.save(Feed.builder()
+                .userId(reviewById.getUserId())
+                .entityId(reviewId)
+                .eventType(EnumEventType.REVIEW)
+                .operation(EnumOperation.REMOVE)
+                .timestamp(Instant.now().toEpochMilli())
+                .build());
         reviewStorage.deleteReview(reviewId);
         log.info("Отзыв id = : " + reviewId + " удалён");
 
