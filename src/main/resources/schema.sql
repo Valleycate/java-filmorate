@@ -91,4 +91,23 @@ create table if not exists Review_like
         REFERENCES Users (id)
         ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS Directors
+(
+    id   INTEGER PRIMARY KEY AUTO_INCREMENT,
+    name varchar(200) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Film_Directors
+(
+    film_id   INTEGER NOT NULL,
+    director_id INTEGER NOT NULL,
+    PRIMARY KEY (film_id, director_id),
+    FOREIGN KEY (director_id)
+        REFERENCES Directors (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (film_id)
+        REFERENCES Film (id)
+        ON DELETE CASCADE
+);
 CREATE UNIQUE INDEX if NOT EXISTS unique_index_review_like ON Review_like (review_id, user_id);
