@@ -23,14 +23,14 @@ public class GenreDbStorage {
             for (GenreModel genre : genreFilm) {
                 genreId.add(genre.getId());
             }
-            ArrayList<GenreModel> genres = new ArrayList<GenreModel>();
+            ArrayList<GenreModel> genres = new ArrayList<>();
             for (Integer id : genreId) {
                 jdbcTemplate.update("INSERT INTO Film_genre (film_id, genre_id) VALUES(?,?);", filmId, id);
                 genres.add(getGenresById(id));
             }
             return genres;
         }
-        return null;
+        return new ArrayList<>();
     }
 
     protected ArrayList<GenreModel> getGenresFilm(int filmId) {
