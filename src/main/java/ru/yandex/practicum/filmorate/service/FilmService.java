@@ -4,11 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
+import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
+import ru.yandex.practicum.filmorate.storage.DAO.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +24,7 @@ import java.util.stream.Collectors;
 public class FilmService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
+    private final FeedDbStorage feedStorage;
     private final DirectorDbStorage directorDbStorage;
 
     public List<Film> findAll() {
@@ -42,6 +48,13 @@ public class FilmService {
         log.info("Поставлен лайк фильму {}", film);
         film.getLikes().add(userId);
         filmStorage.update(film);
+        feedStorage.save(Feed.builder()
+                .userId(userId)
+                .entityId((long) film.getId())
+                .eventType(EnumEventType.LIKE)
+                .operation(EnumOperation.ADD)
+                .timestamp(Instant.now().toEpochMilli())
+                .build());
     }
 
     public void deleteLike(Integer userId, Film film) {
@@ -54,6 +67,13 @@ public class FilmService {
             log.info("Удалён лайк фильму {}", film);
             filmStorage.update(film);
         }
+        feedStorage.save(Feed.builder()
+                .userId(userId)
+                .entityId((long) film.getId())
+                .eventType(EnumEventType.LIKE)
+                .operation(EnumOperation.REMOVE)
+                .timestamp(Instant.now().toEpochMilli())
+                .build());
     }
 
     public List<Film> findTop10Films(int count) {
