@@ -18,4 +18,8 @@ public interface FilmStorage {
     Film deleteById(Integer id);
 
     List<Film> findMutualFilms(int userId, int friendId);
+
+    List<Film> getDirectorsFilms(int directorId);
+
+    List<Film> getSortedByYearFilmsOfDirector(int directorId);
 }

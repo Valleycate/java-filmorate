@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.DAO.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class FilmService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
+    private final DirectorDbStorage directorDbStorage;
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -75,5 +77,24 @@ public class FilmService {
             throw new NonexistentException("Film by id  not exist");
         }
         filmStorage.deleteById(id);
+    }
+
+    public List<Film> sortedFilmsOfDirector(int directorId, String param) {
+        if (directorDbStorage.getDirector(directorId) != null) {
+            switch (param) {
+                case "year":
+                    return filmStorage.getSortedByYearFilmsOfDirector(directorId);
+                case "likes":
+                    return filmStorage.getDirectorsFilms(directorId).stream()
+                            .sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
+                                    .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
+                            )
+                            .collect(Collectors.toList());
+                default:
+                    return null;
+            }
+        } else {
+            return null;
+        }
     }
 }
