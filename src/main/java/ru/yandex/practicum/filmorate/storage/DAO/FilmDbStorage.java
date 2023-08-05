@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.DAO;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaModel;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import javax.sql.DataSource;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -22,42 +21,26 @@ import java.util.Map;
 
 @Repository
 @Primary
+@RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final GenreDbStorage genreDbStorage;
     private final LikeDbStorage likeDbStorage;
     private final MpaDbStorage mpaDbStorage;
-
-    @Autowired
-    public FilmDbStorage(DataSource dataSource) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        genreDbStorage = new GenreDbStorage(jdbcTemplate);
-        likeDbStorage = new LikeDbStorage(jdbcTemplate);
-        mpaDbStorage = new MpaDbStorage(jdbcTemplate);
-    }
+    private final FilmDirectorsDbStorage filmDirectorsDbStorage;
 
     @Override
     public List<Film> findAll() {
         String filmRows = "select * from Film;";
         List<Film> films = new ArrayList<>();
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(filmRows);
-        for (Map<String, Object> map : rows) {
-            Film obj = new Film();
-            obj.setId((Integer) map.get("id"));
-            obj.setName((String) map.get("name"));
-            obj.setDescription((String) map.get("description"));
-            obj.setReleaseDate(Date.valueOf(map.get("release_date").toString()).toLocalDate());
-            obj.setDuration((Integer) map.get("duration"));
-            obj.setMpa(mpaDbStorage.getMpaModel((Integer) map.get("rating_id")));
-            obj.setGenres(genreDbStorage.getGenresFilm(obj.getId()));
-            obj.setLikes(likeDbStorage.getLikes(obj.getId()));
-            films.add(obj);
-        }
+         getFilmsList(films, rows);
         return films;
     }
 
     @Override
     public Film create(Film film) {
+
         MpaModel rating = film.getMpa();
         Integer ratingId;
         if (rating == null) {
@@ -85,8 +68,10 @@ public class FilmDbStorage implements FilmStorage {
         film.setId(key);
         likeDbStorage.updateLikes(film.getLikes(), film.getId());
         genreDbStorage.updateGenre(film.getGenres(), film.getId());
+        filmDirectorsDbStorage.updateDirectorsOfFilm(film.getId(), film.getDirectors());
         film.setMpa(mpaDbStorage.getMpaModel(film.getMpa().getId()));
         film.setGenres(genreDbStorage.getGenresFilm(film.getId()));
+        film.setDirectors(filmDirectorsDbStorage.getDirectorsOfFilm(film.getId()));
         return film;
     }
 
@@ -104,6 +89,8 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update("UPDATE Film SET duration=? WHERE id =?;", film.getDuration(), film.getId());
         jdbcTemplate.update("UPDATE Film SET rating_id=? WHERE id =?;", ratingId, film.getId());
         likeDbStorage.updateLikes(film.getLikes(), film.getId());
+        filmDirectorsDbStorage.updateDirectorsOfFilm(film.getId(), film.getDirectors());
+        film.setDirectors(filmDirectorsDbStorage.getDirectorsOfFilm(film.getId()));
         film.setGenres(genreDbStorage.updateGenre(film.getGenres(), film.getId()));
         film.setMpa(mpaDbStorage.getMpaModel(film.getMpa().getId()));
         return film;
@@ -116,6 +103,7 @@ public class FilmDbStorage implements FilmStorage {
             Film film = makeFilm(filmRows);
             film.setGenres(genreDbStorage.getGenresFilm(id));
             film.setLikes(likeDbStorage.getLikes(id));
+            film.setDirectors(filmDirectorsDbStorage.getDirectorsOfFilm(film.getId()));
             return film;
         } else {
             throw new BadRequest("фильма с таким id нет");
@@ -134,13 +122,56 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Film deleteById(Integer id) {
+    public void deleteById(Integer id) {
         Film film = findFilmById(id);
         if (!jdbcTemplate.queryForList("select id from FILM" +
                 " where id = ?;", id).isEmpty()) {
             jdbcTemplate.update("DELETE From Film WHERE id = ?", id);
         }
         // cascade delete join-table
-        return film;
+    }
+
+    @Override
+    public List<Film> getDirectorsFilms(int directorId) {
+        String filmRows = "select * from Film " +
+                "WHERE ID IN (" +
+                "SELECT FILM_ID " +
+                "FROM FILM_DIRECTORS " +
+                "WHERE DIRECTOR_ID = ?)";
+
+        List<Film> films = new ArrayList<>();
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(filmRows, directorId);
+        getFilmsList(films, rows);
+        return films;
+    }
+    @Override
+    public List<Film> getSortedByYearFilmsOfDirector(int directorId) {
+        String filmRows = "select * from Film " +
+                "WHERE ID IN (" +
+                "SELECT FILM_ID " +
+                "FROM FILM_DIRECTORS " +
+                "WHERE DIRECTOR_ID = ?) " +
+                "ORDER BY RELEASE_DATE";
+
+        List<Film> films = new ArrayList<>();
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(filmRows, directorId);
+        getFilmsList(films, rows);
+        return films;
+    }
+
+    private void getFilmsList(List<Film> films, List<Map<String, Object>> rows){
+        for (Map<String, Object> map : rows) {
+            Film obj = new Film();
+            obj.setId((Integer) map.get("id"));
+            obj.setName((String) map.get("name"));
+            obj.setDescription((String) map.get("description"));
+            obj.setReleaseDate(Date.valueOf(map.get("release_date").toString()).toLocalDate());
+            obj.setDuration((Integer) map.get("duration"));
+            obj.setMpa(mpaDbStorage.getMpaModel((Integer) map.get("rating_id")));
+            obj.setGenres(genreDbStorage.getGenresFilm(obj.getId()));
+            obj.setLikes(likeDbStorage.getLikes(obj.getId()));
+            obj.setDirectors(filmDirectorsDbStorage.getDirectorsOfFilm(obj.getId()));
+            films.add(obj);
+        }
     }
 }
