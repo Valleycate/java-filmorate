@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.DAO.UserDbStorage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -86,14 +87,19 @@ public class UserService {
 
     public List<Film> recommendations(int userId) {
         findUserById(userId);
-        int id = userId;
+        int id = -1;
         int max = 0;
         for (User user : userStorage.findAll()) {
-            int size = filmService.findMutualFilms(userId, user.getId()).size();
-            if (size > max) {
-                id = user.getId();
-                max = size;
+            if (user.getId() != userId) {
+                int size = filmService.findMutualFilms(userId, user.getId()).size();
+                if (size > max) {
+                    id = user.getId();
+                    max = size;
+                }
             }
+        }
+        if (id == -1) {
+            return new ArrayList<>();
         }
         return filmService.recommendations(userId, id);
     }

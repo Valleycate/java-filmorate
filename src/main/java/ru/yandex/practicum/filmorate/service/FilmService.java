@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,6 +80,13 @@ public class FilmService {
     }
 
     public List<Film> recommendations(int userId, int friendId) {
-        return filmStorage.recommendations(userId, friendId);
+        List<Film> films = filmStorage.recommendations(userId, friendId);
+        List<Film> recommendations = new ArrayList<>();
+        for (Film film : films) {
+            if (film.getLikes().contains(friendId) && !film.getLikes().contains(userId)) {
+                recommendations.add(film);
+            }
+        }
+        return recommendations;
     }
 }
