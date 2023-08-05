@@ -210,6 +210,59 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    @Override
+    public List<Film> searchFilms(String query, List<String> searchByParams) {
+        List<Film> films = new ArrayList<>();
+        if (searchByParams.contains("title") && searchByParams.contains("director")) {
+            films = searchFilmsByTitleAndDirector(query);
+        } else if (searchByParams.contains("title") && !searchByParams.contains("director")) {
+            films = searchFilmsByTitle(query);
+        } else if (!searchByParams.contains("title") && searchByParams.contains("director")) {
+            films = searchFilmsByDirector(query);
+        }
+        return films;
+    }
+
+    private List<Film> searchFilmsByDirector(String query) {
+        String sqlQuery = "select f.* from Film as f " +
+                "left join Film_Directors as fd on f.id = fd.film_id " +
+                "left join Directors as d on fd.director_id = d.id " +
+                "left join Likes as fl on f.id = fl.film_id " +
+                "where d.name ilike ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.USER_ID) desc";
+        List<Film> films = new ArrayList<>();
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sqlQuery, "%" + query + "%");
+        getFilmsList(films, rows);
+        return films;
+    }
+
+    private List<Film> searchFilmsByTitle(String query) {
+        String sqlQuery = "select f.* from Film as f " +
+                "left join Likes as fl on f.id = fl.film_id " +
+                "where f.name ilike ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.USER_ID) desc";
+        List<Film> films = new ArrayList<>();
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sqlQuery, "%" + query + "%");
+        getFilmsList(films, rows);
+        return films;
+    }
+
+    private List<Film> searchFilmsByTitleAndDirector(String query) {
+        String sqlQuery = "select f.* from Film as f " +
+                "left join Film_Directors as fd on f.id = fd.film_id " +
+                "left join Directors as d on fd.director_id = d.id " +
+                "left join Likes as fl on f.id = fl.film_id " +
+                "where f.name ilike ? or d.name ilike ? " +
+                "GROUP BY f.id " +
+                "ORDER BY COUNT(fl.USER_ID) desc";
+        List<Film> films = new ArrayList<>();
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sqlQuery, "%" + query + "%", "%" + query + "%");
+        getFilmsList(films, rows);
+        return films;
+    }
+
     private void getFilmsList(List<Film> films, List<Map<String, Object>> rows) {
         for (Map<String, Object> map : rows) {
             Film obj = new Film();
