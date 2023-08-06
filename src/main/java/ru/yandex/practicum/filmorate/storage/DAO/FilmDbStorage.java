@@ -225,4 +225,26 @@ public class FilmDbStorage implements FilmStorage {
             films.add(obj);
         }
     }
+
+    public List<Film> recommendations(int userId, int friendId) {
+        List<Film> films = new ArrayList<>();
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(
+                "SELECT  *\n" +
+                        "FROM FILM \n" +
+                        "INNER JOIN LIKES ON FILM.id = LIKES.film_id\n" +
+                        "WHERE LIKES.user_id = ? AND LIKES.user_id != ?;", friendId, userId);
+        for (Map<String, Object> map : rows) {
+            Film obj = new Film();
+            obj.setId((Integer) map.get("id"));
+            obj.setName((String) map.get("name"));
+            obj.setDescription((String) map.get("description"));
+            obj.setReleaseDate(Date.valueOf(map.get("release_date").toString()).toLocalDate());
+            obj.setDuration((Integer) map.get("duration"));
+            obj.setMpa(mpaDbStorage.getMpaModel((Integer) map.get("rating_id")));
+            obj.setGenres(genreDbStorage.getGenresFilm(obj.getId()));
+            obj.setLikes(likeDbStorage.getLikes(obj.getId()));
+            films.add(obj);
+        }
+        return films;
+    }
 }

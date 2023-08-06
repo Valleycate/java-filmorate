@@ -14,6 +14,7 @@ import ru.yandex.practicum.filmorate.storage.DAO.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.ArrayList;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -117,5 +118,16 @@ public class FilmService {
         } else {
             return null;
         }
+    }
+
+    public List<Film> recommendations(int userId, int friendId) {
+        List<Film> films = filmStorage.recommendations(userId, friendId);
+        List<Film> recommendations = new ArrayList<>();
+        for (Film film : films) {
+            if (film.getLikes().contains(friendId) && !film.getLikes().contains(userId)) {
+                recommendations.add(film);
+            }
+        }
+        return recommendations;
     }
 }
