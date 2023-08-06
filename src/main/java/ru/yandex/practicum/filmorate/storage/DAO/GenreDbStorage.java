@@ -13,7 +13,7 @@ import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
-public class GenreDbStorage implements GenreStorage{
+public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     protected ArrayList<GenreModel> updateGenre(ArrayList<GenreModel> genreFilm, int filmId) {
