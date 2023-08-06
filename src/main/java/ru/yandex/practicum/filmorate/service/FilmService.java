@@ -130,4 +130,9 @@ public class FilmService {
         }
         return recommendations;
     }
+
+    public List<Film> searchFilms(String query, List<String> searchByParams) {
+        return filmStorage.searchFilms(query, searchByParams);
+
+    }
 }
