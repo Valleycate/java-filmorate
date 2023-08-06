@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
 import ru.yandex.practicum.filmorate.storage.DAO.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -26,6 +27,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final FeedDbStorage feedStorage;
     private final DirectorDbStorage directorDbStorage;
+    private final GenreStorage genreStorage;
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -76,12 +78,11 @@ public class FilmService {
                 .build());
     }
 
-    public List<Film> findTop10Films(int count) {
-        return filmStorage.findAll().stream()
-                .sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
-                        .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
-                )
-                .limit(count).collect(Collectors.toList());
+    public List<Film> findTop10Films(int count, Integer genreId, Integer year) {
+        if (genreId != null && genreStorage.getGenresById(genreId) == null) {
+            throw new NonexistentException("not exist genres with current id");
+        }
+        return filmStorage.findTop10Films(count, genreId, year);
     }
 
     public List<Film> findMutualFilms(Integer userId, Integer friendId) {
