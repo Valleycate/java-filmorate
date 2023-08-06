@@ -13,7 +13,7 @@ import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
-public class GenreDbStorage {
+public class GenreDbStorage implements GenreStorage{
     private final JdbcTemplate jdbcTemplate;
 
     protected ArrayList<GenreModel> updateGenre(ArrayList<GenreModel> genreFilm, int filmId) {
@@ -45,6 +45,7 @@ public class GenreDbStorage {
         return filmGenre;
     }
 
+    @Override
     public List<GenreModel> findAllGenre() {
         String sql = "select * From Genre";
         return jdbcTemplate.query(sql, this::makeGenre);
@@ -57,6 +58,7 @@ public class GenreDbStorage {
         return genre;
     }
 
+    @Override
     public GenreModel getGenresById(Integer id) {
         SqlRowSet sql = jdbcTemplate.queryForRowSet("Select name from Genre where id = ?", id);
         GenreModel genre = new GenreModel();

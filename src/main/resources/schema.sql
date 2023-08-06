@@ -111,3 +111,4 @@ CREATE TABLE IF NOT EXISTS Film_Directors
         ON DELETE CASCADE
 );
 CREATE UNIQUE INDEX if NOT EXISTS unique_index_review_like ON Review_like (review_id, user_id);
+
