@@ -177,27 +177,27 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> findTop10Films(int count, Integer genreId, Integer year) {
         String sqlString, sqlString1;
-        Object [] localVar;
+        Object[] localVar;
         sqlString1 = "SELECT F.*,  M.ID AS rating_id, POP.COUNT1 FROM FILM AS F " +
                 "LEFT JOIN  (SELECT FILM_ID, COUNT(USER_ID) AS COUNT1 " +
                 "FROM LIKES GROUP BY FILM_ID ) AS POP ON F.ID = POP.FILM_ID " +
                 "LEFT JOIN MPA M on M.ID = F.RATING_ID ";
 
         if (genreId == null && year == null) {
-            localVar = new Object[] {count};
+            localVar = new Object[]{count};
             sqlString = sqlString1 + " ORDER BY POP.COUNT1 DESC LIMIT ?";
         } else if (genreId == null) {
-            localVar = new Object[] {year, count};
+            localVar = new Object[]{year, count};
             sqlString = sqlString1 + " WHERE  YEAR(F.RELEASE_DATE)   = ?" +
                     "        ORDER BY POP.COUNT1 DESC LIMIT ?";
         } else if (year == null) {
-            localVar = new Object[] {genreId, count};
+            localVar = new Object[]{genreId, count};
             sqlString = sqlString1 + " INNER JOIN FILM_GENRE FG on F.ID = FG.FILM_ID" +
                     "        INNER JOIN GENRE G1 on FG.GENRE_ID = G1.id" +
                     "        WHERE G1.id = ?" +
                     "        ORDER BY POP.COUNT1 DESC LIMIT ?";
         } else {
-            localVar = new Object[] {genreId, year, count};
+            localVar = new Object[]{genreId, year, count};
             sqlString = sqlString1 + "INNER JOIN FILM_GENRE FG on F.ID = FG.FILM_ID" +
                     "        INNER JOIN GENRE G1 on FG.GENRE_ID = G1.id" +
                     "        WHERE G1.id = ? AND YEAR(F.RELEASE_DATE)   = ?" +
@@ -209,6 +209,7 @@ public class FilmDbStorage implements FilmStorage {
         getFilmsList(films, rows);
         return films;
     }
+
     private void getFilmsList(List<Film> films, List<Map<String, Object>> rows) {
         for (Map<String, Object> map : rows) {
             Film obj = new Film();
