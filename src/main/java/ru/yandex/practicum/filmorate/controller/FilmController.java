@@ -2,11 +2,13 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,8 +56,10 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> findTop10Films(@RequestParam(required = false, defaultValue = "10") Integer count) {
-        return filmService.findTop10Films(count);
+    public List<Film> findTop10Films(@RequestParam(required = false, defaultValue = "10") Integer count,
+                                     @RequestParam(required = false) @Validated @Positive Integer genreId,
+                                     @RequestParam(required = false) @Validated  @Positive Integer year) {
+        return filmService.findTop10Films(count, genreId, year);
     }
 
     @DeleteMapping("/{id}")
@@ -63,5 +67,9 @@ public class FilmController {
         log.info("A movie delete from database");
         filmService.deleteById(id);
     }
-}
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> sortedFilmsOfDirector(@PathVariable("directorId") Integer id, @RequestParam("sortBy") String param) {
+        return filmService.sortedFilmsOfDirector(id, param);
+    }
+}

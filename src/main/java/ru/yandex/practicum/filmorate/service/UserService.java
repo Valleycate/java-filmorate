@@ -5,10 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
+import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
+import ru.yandex.practicum.filmorate.storage.DAO.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.UserDbStorage;
 
 import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 
 
@@ -17,6 +22,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserDbStorage userStorage;
+    private final FeedDbStorage feedStorage;
+
     private final FilmService filmService;
 
     public List<User> findAll() {
@@ -48,10 +55,24 @@ public class UserService {
 
     public void addFriend(User user, User friend) {
         userStorage.addFriend(user, friend);
+        feedStorage.save(Feed.builder()
+                .userId(user.getId())
+                .entityId((long) friend.getId())
+                .eventType(EnumEventType.FRIEND)
+                .operation(EnumOperation.ADD)
+                .timestamp(Instant.now().toEpochMilli())
+                .build());
     }
 
     public void deleteFriend(User user, User friend) {
         userStorage.deleteFriend(user, friend);
+        feedStorage.save(Feed.builder()
+                .userId(user.getId())
+                .entityId((long) friend.getId())
+                .eventType(EnumEventType.FRIEND)
+                .operation(EnumOperation.REMOVE)
+                .timestamp(Instant.now().toEpochMilli())
+                .build());
     }
 
     public List<User> findMutualFriends(Integer id, Integer otherId) {
@@ -102,5 +123,10 @@ public class UserService {
             return new ArrayList<>();
         }
         return filmService.recommendations(userId, id);
+    }
+
+    public List<Feed> getFeed(Integer userId) {
+        findUserById(userId);
+        return feedStorage.findUsersFeed(userId);
     }
 }

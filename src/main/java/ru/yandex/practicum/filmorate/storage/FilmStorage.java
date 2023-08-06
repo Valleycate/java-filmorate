@@ -20,4 +20,10 @@ public interface FilmStorage {
     List<Film> recommendations(int userId, int friendId);
 
     List<Film> findMutualFilms(int userId, int friendId);
+
+    List<Film> getDirectorsFilms(int directorId);
+
+    List<Film> findTop10Films(int count, Integer genreId, Integer year);
+
+    List<Film> getSortedByYearFilmsOfDirector(int directorId);
 }
