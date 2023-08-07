@@ -67,7 +67,7 @@ public class FilmDbStorage implements FilmStorage {
         int key = (int) keyHolder.getKey();
         film.setId(key);
         likeDbStorage.updateLikes(film.getLikes(), film.getId());
-        genreDbStorage.updateGenre(new ArrayList<>(film.getGenres()), film.getId());
+        genreDbStorage.updateGenre(film.getGenres(), film.getId());
         filmDirectorsDbStorage.updateDirectorsOfFilm(film.getId(), film.getDirectors());
         film.setMpa(mpaDbStorage.getMpaModel(film.getMpa().getId()));
         film.setGenres(new ArrayList<>(genreDbStorage.getGenresFilm(film.getId())));
@@ -91,7 +91,7 @@ public class FilmDbStorage implements FilmStorage {
         likeDbStorage.updateLikes(film.getLikes(), film.getId());
         filmDirectorsDbStorage.updateDirectorsOfFilm(film.getId(), film.getDirectors());
         film.setDirectors(filmDirectorsDbStorage.getDirectorsOfFilm(film.getId()));
-        film.setGenres(new ArrayList<>(genreDbStorage.updateGenre(new ArrayList<>(film.getGenres()), film.getId())));
+        film.setGenres(new ArrayList<>(genreDbStorage.updateGenre(film.getGenres(), film.getId())));
         film.setMpa(mpaDbStorage.getMpaModel(film.getMpa().getId()));
         return film;
     }
