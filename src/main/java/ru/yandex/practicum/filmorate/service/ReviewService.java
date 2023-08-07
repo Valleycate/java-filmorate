@@ -7,10 +7,10 @@ import ru.yandex.practicum.filmorate.exceptions.validationException.BadRequest;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
+import ru.yandex.practicum.filmorate.service.util.FeedSaver;
 import ru.yandex.practicum.filmorate.storage.DAO.Interface.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.ReviewDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.ReviewLikeDbStorage;
-import ru.yandex.practicum.filmorate.util.FeedSaver;
 
 import java.util.Comparator;
 import java.util.List;
@@ -26,6 +26,7 @@ public class ReviewService {
     private final UserService userService;
     private final FilmStorage filmStorage;
     private final ReviewLikeDbStorage reviewLikeStorage;
+    private final FeedSaver feedSaver;
 
     public List<Review> findAllReviews() {
         List<Review> reviews = reviewStorage.getAllReviews();
@@ -60,7 +61,7 @@ public class ReviewService {
 
         Review savedReview = reviewStorage.saveReview(review);
         log.info("Добавлен новый отзыв: {}", savedReview);
-        FeedSaver.saveFeed(savedReview.getUserId(), savedReview.getReviewId(), EnumEventType.REVIEW, EnumOperation.ADD);
+        feedSaver.saveFeed(savedReview.getUserId(), savedReview.getReviewId(), EnumEventType.REVIEW, EnumOperation.ADD);
         enrichReviewByUseful(savedReview);
         return savedReview;
     }
@@ -70,14 +71,14 @@ public class ReviewService {
         //айди фильма и юзера не могут поменяться при обновлении
         Review updateReview = reviewStorage.updateReview(review);
         log.info("Отзыв обновлён : {}", updateReview);
-        FeedSaver.saveFeed(updateReview.getUserId(), updateReview.getReviewId(), EnumEventType.REVIEW, EnumOperation.UPDATE);
+        feedSaver.saveFeed(updateReview.getUserId(), updateReview.getReviewId(), EnumEventType.REVIEW, EnumOperation.UPDATE);
         enrichReviewByUseful(updateReview);
         return updateReview;
     }
 
     public void deleteReview(Long reviewId) {
         Review reviewById = findReviewById(reviewId);
-        FeedSaver.saveFeed(reviewById.getUserId(), reviewId, EnumEventType.REVIEW, EnumOperation.REMOVE);
+        feedSaver.saveFeed(reviewById.getUserId(), reviewId, EnumEventType.REVIEW, EnumOperation.REMOVE);
         reviewStorage.deleteReview(reviewId);
         log.info("Отзыв id: {} удалён", reviewId);
     }

@@ -1,6 +1,6 @@
-package ru.yandex.practicum.filmorate.util;
+package ru.yandex.practicum.filmorate.service.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
@@ -10,15 +10,11 @@ import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
 import java.time.Instant;
 
 @Component
+@RequiredArgsConstructor
 public final class FeedSaver {
-    private static FeedDbStorage feedStorage;
+    private final FeedDbStorage feedStorage;
 
-    @Autowired
-    private FeedSaver(FeedDbStorage feedStorage) {
-        FeedSaver.feedStorage = feedStorage;
-    }
-
-    public static void saveFeed(Integer userId, Long entityId, EnumEventType eventType, EnumOperation operation) {
+    public void saveFeed(Integer userId, Long entityId, EnumEventType eventType, EnumOperation operation) {
         feedStorage.save(Feed.builder()
                 .userId(userId)
                 .entityId(entityId)
