@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
-import ru.yandex.practicum.filmorate.storage.DAO.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
 
 import java.time.Instant;
 
@@ -18,7 +18,7 @@ public final class FeedSaver {
         FeedSaver.feedStorage = feedStorage;
     }
 
-    static public void saveFeed(Integer userId, Long entityId, EnumEventType eventType, EnumOperation operation) {
+    public static void saveFeed(Integer userId, Long entityId, EnumEventType eventType, EnumOperation operation) {
         feedStorage.save(Feed.builder()
                 .userId(userId)
                 .entityId(entityId)

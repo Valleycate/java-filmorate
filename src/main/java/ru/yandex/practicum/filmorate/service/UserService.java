@@ -11,8 +11,6 @@ import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.UserDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.FeedDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.UserDbStorage;
 import ru.yandex.practicum.filmorate.util.FeedSaver;
 
 import java.util.ArrayList;

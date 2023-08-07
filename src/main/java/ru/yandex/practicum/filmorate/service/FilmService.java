@@ -11,11 +11,6 @@ import ru.yandex.practicum.filmorate.storage.DAO.Interface.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.Interface.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.Interface.UserStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.DirectorDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.DirectorDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.util.FeedSaver;
 
 import java.util.ArrayList;
