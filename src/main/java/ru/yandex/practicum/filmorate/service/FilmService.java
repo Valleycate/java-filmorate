@@ -5,9 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
+import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
+import ru.yandex.practicum.filmorate.storage.DAO.Interface.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.Interface.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.Interface.UserStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.util.FeedSaver;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +24,8 @@ import java.util.stream.Collectors;
 public class FilmService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
+    private final DirectorDbStorage directorDbStorage;
+    private final GenreStorage genreStorage;
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -40,6 +48,7 @@ public class FilmService {
         log.info("Поставлен лайк фильму {}", film);
         film.getLikes().add(userId);
         filmStorage.update(film);
+        FeedSaver.saveFeed(userId, (long) film.getId(), EnumEventType.LIKE, EnumOperation.ADD);
     }
 
     public void deleteLike(Integer userId, Film film) {
@@ -52,21 +61,64 @@ public class FilmService {
             log.info("Удалён лайк фильму {}", film);
             filmStorage.update(film);
         }
+        FeedSaver.saveFeed(userId, (long) film.getId(), EnumEventType.LIKE, EnumOperation.REMOVE);
     }
 
-    public List<Film> findTop10Films(int count) {
-        return filmStorage.findAll().stream()
+    public List<Film> findTop10Films(int count, Integer genreId, Integer year) {
+        if (genreId != null && genreStorage.getGenresById(genreId) == null) {
+            throw new NonexistentException("not exist genres with current id");
+        }
+        return filmStorage.findTop10Films(count, genreId, year);
+    }
+
+    public List<Film> findMutualFilms(Integer userId, Integer friendId) {
+        userStorage.findUserById(userId);
+        userStorage.findUserById(friendId);
+        return filmStorage.findMutualFilms(userId, friendId)
+                .stream()
                 .sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
                         .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
-                )
-                .limit(count).collect(Collectors.toList());
+                ).collect(Collectors.toList());
     }
-
 
     public void deleteById(Integer id) {
         if (filmStorage.findFilmById(id) == null) {
             throw new NonexistentException("Film by id  not exist");
         }
         filmStorage.deleteById(id);
+    }
+
+    public List<Film> sortedFilmsOfDirector(int directorId, String param) {
+        if (directorDbStorage.getDirector(directorId) != null) {
+            switch (param) {
+                case "year":
+                    return filmStorage.getSortedByYearFilmsOfDirector(directorId);
+                case "likes":
+                    return filmStorage.getDirectorsFilms(directorId).stream()
+                            .sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
+                                    .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
+                            )
+                            .collect(Collectors.toList());
+                default:
+                    return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public List<Film> recommendations(int userId, int friendId) {
+        List<Film> films = filmStorage.recommendations(userId, friendId);
+        List<Film> recommendations = new ArrayList<>();
+        for (Film film : films) {
+            if (film.getLikes().contains(friendId) && !film.getLikes().contains(userId)) {
+                recommendations.add(film);
+            }
+        }
+        return recommendations;
+    }
+
+    public List<Film> searchFilms(String query, List<String> searchByParams) {
+        return filmStorage.searchFilms(query, searchByParams);
     }
 }

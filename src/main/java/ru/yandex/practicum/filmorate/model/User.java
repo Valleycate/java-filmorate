@@ -3,16 +3,18 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 
 @Data
+@NoArgsConstructor
 public class User {
     @EqualsAndHashCode.Exclude
     private int id;
-    @Pattern(regexp = "\\S+",message = "login with whitespaces")
+    @Pattern(regexp = "\\S+", message = "login with whitespaces")
     @NotBlank(message = "Please provide a login")
     private String login;
     private String name;
@@ -31,4 +33,5 @@ public class User {
         this.birthday = birthday;
         this.name = name;
     }
+
 }
