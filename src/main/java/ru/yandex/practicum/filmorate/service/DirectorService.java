@@ -14,7 +14,7 @@ public class DirectorService {
 
     private final DirectorDbStorage directorDbStorage;
 
-    private static void checkName(Director director) {
+    private void checkName(Director director) {
         if (director.getName() == null || director.getName().isBlank()) {
             throw new InvalidNameException("Имя некорректное");
         }

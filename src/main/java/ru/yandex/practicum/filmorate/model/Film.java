@@ -9,6 +9,7 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -28,5 +29,5 @@ public class Film {
     private Set<Integer> likes = new HashSet<>();
     private ArrayList<GenreModel> genres;
     private MpaModel mpa;
-    private ArrayList<Director> directors;
+    private List<Director> directors;
 }
