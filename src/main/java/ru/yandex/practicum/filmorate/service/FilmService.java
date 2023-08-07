@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
-import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
@@ -12,8 +11,9 @@ import ru.yandex.practicum.filmorate.storage.DAO.Interface.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.Interface.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.Interface.UserStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.DirectorDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
+import ru.yandex.practicum.filmorate.util.FeedSaver;
 
+import java.util.ArrayList;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 public class FilmService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
-    private final FeedDbStorage feedStorage;
     private final DirectorDbStorage directorDbStorage;
     private final GenreStorage genreStorage;
 
@@ -50,13 +49,7 @@ public class FilmService {
         log.info("Поставлен лайк фильму {}", film);
         film.getLikes().add(userId);
         filmStorage.update(film);
-        feedStorage.save(Feed.builder()
-                .userId(userId)
-                .entityId((long) film.getId())
-                .eventType(EnumEventType.LIKE)
-                .operation(EnumOperation.ADD)
-                .timestamp(Instant.now().toEpochMilli())
-                .build());
+        FeedSaver.saveFeed(userId, (long) film.getId(), EnumEventType.LIKE, EnumOperation.ADD);
     }
 
     public void deleteLike(Integer userId, Film film) {
@@ -69,13 +62,7 @@ public class FilmService {
             log.info("Удалён лайк фильму {}", film);
             filmStorage.update(film);
         }
-        feedStorage.save(Feed.builder()
-                .userId(userId)
-                .entityId((long) film.getId())
-                .eventType(EnumEventType.LIKE)
-                .operation(EnumOperation.REMOVE)
-                .timestamp(Instant.now().toEpochMilli())
-                .build());
+        FeedSaver.saveFeed(userId, (long) film.getId(), EnumEventType.LIKE, EnumOperation.REMOVE);
     }
 
     public List<Film> findTop10Films(int count, Integer genreId, Integer year) {
@@ -130,6 +117,5 @@ public class FilmService {
 
     public List<Film> searchFilms(String query, List<String> searchByParams) {
         return filmStorage.searchFilms(query, searchByParams);
-
     }
 }

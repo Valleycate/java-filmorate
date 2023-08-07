@@ -1,19 +1,17 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.validationException.BadRequest;
-import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
 import ru.yandex.practicum.filmorate.storage.DAO.Interface.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.Interface.UserStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.ReviewDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.ReviewLikeDbStorage;
+import ru.yandex.practicum.filmorate.util.FeedSaver;
 
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -22,22 +20,12 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class ReviewService {
     private final ReviewDbStorage reviewStorage;
     private final UserService userService;
     private final FilmStorage filmStorage;
     private final ReviewLikeDbStorage reviewLikeStorage;
-    private final FeedDbStorage feedStorage;
-
-
-    public ReviewService(ReviewDbStorage reviewStorage, UserService userService, FilmService filmService, UserStorage userStorage, UserService userService1, FilmStorage filmStorage, ReviewLikeDbStorage reviewLikeStorage, FeedDbStorage feedStorage) {
-        this.reviewStorage = reviewStorage;
-        this.userService = userService1;
-        this.filmStorage = filmStorage;
-        this.reviewLikeStorage = reviewLikeStorage;
-        this.feedStorage = feedStorage;
-    }
-
 
     public List<Review> findAllReviews() {
         List<Review> reviews = reviewStorage.getAllReviews();
@@ -46,20 +34,18 @@ public class ReviewService {
     }
 
     private void enrichReviewsByUseful(List<Review> allReviews) {
-        allReviews.forEach(review -> review.setUseful(
-                Optional.ofNullable(reviewLikeStorage.sumLikeDislike(review.getReviewId())).orElse(0)));
+        allReviews.forEach(this::enrichReviewByUseful);
         allReviews.sort(Comparator.comparingInt(Review::getUseful).reversed());
     }
 
-    private void enrichReviewsByUseful(Review review) {
+    private void enrichReviewByUseful(Review review) {
         review.setUseful(Optional.ofNullable(reviewLikeStorage.sumLikeDislike(review.getReviewId())).orElse(0));
     }
-
 
     public Review findReviewById(Long reviewId) {
         Review reviewById = reviewStorage.findReviewById(reviewId);
         if (Objects.nonNull(reviewById)) {
-            enrichReviewsByUseful(reviewById);
+            enrichReviewByUseful(reviewById);
             return reviewById;
         } else {
             log.error("Отзыв не найден id = {}", reviewId);
@@ -71,49 +57,29 @@ public class ReviewService {
         //проверка что айди фильма и юзера существуют
         userService.findUserById(review.getUserId());
         filmStorage.findFilmById(review.getFilmId());
-        enrichReviewsByUseful(review);
 
         Review savedReview = reviewStorage.saveReview(review);
         log.info("Добавлен новый отзыв: {}", savedReview);
-        feedStorage.save(Feed.builder()
-                .userId(savedReview.getUserId())
-                .entityId(savedReview.getReviewId())
-                .eventType(EnumEventType.REVIEW)
-                .operation(EnumOperation.ADD)
-                .timestamp(Instant.now().toEpochMilli())
-                .build());
+        FeedSaver.saveFeed(savedReview.getUserId(), savedReview.getReviewId(), EnumEventType.REVIEW, EnumOperation.ADD);
+        enrichReviewByUseful(savedReview);
         return savedReview;
-
     }
 
     public Review updateReview(Review review) {
         findReviewById(review.getReviewId());
         //айди фильма и юзера не могут поменяться при обновлении
-        enrichReviewsByUseful(review);
         Review updateReview = reviewStorage.updateReview(review);
         log.info("Отзыв обновлён : {}", updateReview);
-        feedStorage.save(Feed.builder()
-                .userId(updateReview.getUserId())
-                .entityId(updateReview.getReviewId())
-                .eventType(EnumEventType.REVIEW)
-                .operation(EnumOperation.UPDATE)
-                .timestamp(Instant.now().toEpochMilli())
-                .build());
+        FeedSaver.saveFeed(updateReview.getUserId(), updateReview.getReviewId(), EnumEventType.REVIEW, EnumOperation.UPDATE);
+        enrichReviewByUseful(updateReview);
         return updateReview;
     }
 
     public void deleteReview(Long reviewId) {
         Review reviewById = findReviewById(reviewId);
-        feedStorage.save(Feed.builder()
-                .userId(reviewById.getUserId())
-                .entityId(reviewId)
-                .eventType(EnumEventType.REVIEW)
-                .operation(EnumOperation.REMOVE)
-                .timestamp(Instant.now().toEpochMilli())
-                .build());
+        FeedSaver.saveFeed(reviewById.getUserId(), reviewId, EnumEventType.REVIEW, EnumOperation.REMOVE);
         reviewStorage.deleteReview(reviewId);
-        log.info("Отзыв id = : " + reviewId + " удалён");
-
+        log.info("Отзыв id: {} удалён", reviewId);
     }
 
     public List<Review> findReviewsByFilmId(int filmId, Integer count) {
@@ -146,27 +112,31 @@ public class ReviewService {
         List<Integer> whoLikeReview = reviewLikeStorage.whoLikeReview(reviewId);
         List<Integer> whoDislikeReview = reviewLikeStorage.whoDislikeReview(reviewId);
         if (isLike) { //прилетел лайк
-            if (!whoLikeReview.contains(userId) && !whoDislikeReview.contains(userId)) { //проверяем, что от этого юзера нет лайка или дизлайка
+            if (isNotExistLikeOrDislike(userId, whoLikeReview, whoDislikeReview)) { //проверяем, что от этого юзера нет лайка или дизлайка
                 reviewLikeStorage.addLikeDislike(reviewId, userId, true); //добавляем лайк
-                log.info("Пользователь id = : " + userId + " поставил like отзыву id = " + reviewId);
+                log.info("Пользователь id: {} поставил like отзыву id: {}", userId, reviewId);
             } else if (!whoLikeReview.contains(userId) && whoDislikeReview.contains(userId)) { //если есть дизлайк, то
-                deleteLikeDislike(reviewId, userId, false); //удаляем дизлайк
-                log.info("Пользователь id = : " + userId + " удалил dislike отзыву id = " + reviewId);
-                reviewLikeStorage.addLikeDislike(reviewId, userId, true); //ставим лайк
-                log.info("Пользователь id = : " + userId + " поставил like отзыву id = " + reviewId);
+                deleteAndAddLikeDislike(reviewId, userId, true, "like");
             }
         }
         if (!isLike) { // прилетел дизлайк
-            if (!whoLikeReview.contains(userId) && !whoDislikeReview.contains(userId)) {
+            if (isNotExistLikeOrDislike(userId, whoLikeReview, whoDislikeReview)) {
                 reviewLikeStorage.addLikeDislike(reviewId, userId, false);
-                log.info("Пользователь id = : " + userId + " поставил dislike отзыву id = " + reviewId);
-            } else if (whoLikeReview.contains(userId) && !whoDislikeReview.contains(userId)) {
-                deleteLikeDislike(reviewId, userId, true); //удаляем лайк
-                log.info("Пользователь id = : " + userId + " удалил like отзыву id = " + reviewId);
-                reviewLikeStorage.addLikeDislike(reviewId, userId, false); //ставим дизлайк
-                log.info("Пользователь id = : " + userId + " поставил dislike отзыву id = " + reviewId);
+                log.info("Пользователь id: {} поставил dislike отзыву id: {}", userId, reviewId);
+            } else if (whoLikeReview.contains(userId) && !whoDislikeReview.contains(userId)) { //если есть лайк, то
+                deleteAndAddLikeDislike(reviewId, userId, false, "dislike");
             }
         }
+    }
+
+    private void deleteAndAddLikeDislike(Long reviewId, int userId, boolean isLike, String nameOfAdd) {
+        deleteLikeDislike(reviewId, userId, !isLike); //удаляем дизлайк/лайк. Логирование в методе delete
+        reviewLikeStorage.addLikeDislike(reviewId, userId, isLike); //ставим лайк/дизлайк
+        log.info("Пользователь id: {} поставил {} отзыву id: {}", userId, nameOfAdd, reviewId);
+    }
+
+    private boolean isNotExistLikeOrDislike(int userId, List<Integer> whoLikeReview, List<Integer> whoDislikeReview) {
+        return !whoLikeReview.contains(userId) && !whoDislikeReview.contains(userId);
     }
 
     public void deleteLikeDislike(Long reviewId, int userId, Boolean isLike) {
@@ -174,12 +144,11 @@ public class ReviewService {
         userService.findUserById(userId);
         //при удалении лайка/дизлайка, которого нет, ничего не происходит, ошибка не выдаётся
         if (isLike) {
-            log.info("Пользователь id = : " + userId + " удалил like отзыву id = " + reviewId);
-            reviewLikeStorage.deleteLikeDislike(reviewId, userId, true);
+            log.info("Пользователь id: {} удалил like отзыву id: {}", userId, reviewId);
+            reviewLikeStorage.deleteLikeDislike(reviewId, userId);
         } else {
-            log.info("Пользователь id = : " + userId + " удалил dislike отзыву id = " + reviewId);
-            reviewLikeStorage.deleteLikeDislike(reviewId, userId, false);
+            log.info("Пользователь id: {} удалил dislike отзыву id: {}", userId, reviewId);
+            reviewLikeStorage.deleteLikeDislike(reviewId, userId);
         }
-
     }
 }
