@@ -15,7 +15,6 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -123,7 +122,7 @@ public class FilmService {
     public List<Film> getRecommendations(int userId, int friendId) {
         List<Film> recommendations = filmStorage.getRecommendations(userId, friendId);
         return recommendations.stream()
-                .filter(film -> film.getLikes().contains(friendId)&& !film.getLikes().contains(userId))
+                .filter(film -> film.getLikes().contains(friendId) && !film.getLikes().contains(userId))
                 .collect(Collectors.toList());
     }
 
