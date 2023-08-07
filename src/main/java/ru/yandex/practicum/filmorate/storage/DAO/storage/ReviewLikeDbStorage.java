@@ -34,7 +34,7 @@ public class ReviewLikeDbStorage {
         jdbcOperations.update(sqlQuery, map, keyHolder);
     }
 
-    public void deleteLikeDislike(Long reviewId, int userId, boolean isLike) {
+    public void deleteLikeDislike(Long reviewId, int userId) {
         String sqlQuery = "delete from Review_like where user_id = :user_id and review_id = :review_id";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -47,7 +47,6 @@ public class ReviewLikeDbStorage {
 
     public Integer sumLikeDislike(Long reviewId) {
         String sqlQuery = "select sum(like_dislike) as useful from Review_like where review_id = :review_id";
-        KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("review_id", reviewId);
         return jdbcOperations.queryForObject(sqlQuery, map, Integer.class);
@@ -55,8 +54,6 @@ public class ReviewLikeDbStorage {
 
     public List<Integer> whoLikeReview(Long reviewId) {
         String sqlQuery = "select user_id from Review_like where review_id = :review_id and like_dislike = :LIKE";
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("review_id", reviewId);
         map.addValue("LIKE", LIKE);
@@ -65,8 +62,6 @@ public class ReviewLikeDbStorage {
 
     public List<Integer> whoDislikeReview(Long reviewId) {
         String sqlQuery = "select user_id from Review_like where review_id = :review_id and like_dislike = :DISLIKE";
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("review_id", reviewId);
         map.addValue("DISLIKE", DISLIKE);

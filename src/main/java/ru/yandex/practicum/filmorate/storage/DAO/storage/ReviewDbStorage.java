@@ -23,17 +23,12 @@ public class ReviewDbStorage {
 
     public List<Review> getAllReviews() {
         String sqlQuery = "select * from Review ";
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource map = new MapSqlParameterSource();
-
         return jdbcOperations.query(sqlQuery, map, new ReviewRowMapper());
     }
 
     public Review findReviewById(Long reviewId) {
         String sqlQuery = "select * from Review where review_id = :review_id";
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("review_id", reviewId);
         List<Review> review = jdbcOperations.query(sqlQuery, map, new ReviewRowMapper());
@@ -93,12 +88,9 @@ public class ReviewDbStorage {
 
     public List<Review> findReviewsByFilmId(int filmId) {
         String sqlQuery = "select * from Review where film_id = :film_id";
-
-        KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("film_id", filmId);
         return jdbcOperations.query(sqlQuery, map, new ReviewRowMapper());
-
     }
 
     static class ReviewRowMapper implements RowMapper<Review> {

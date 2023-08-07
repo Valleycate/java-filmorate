@@ -26,7 +26,6 @@ public class FeedDbStorage {
     public List<Feed> findUsersFeed(Integer userId) {
         String sqlQuery = "select * from Feed where user_id = :user_id";
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
         MapSqlParameterSource map = new MapSqlParameterSource();
         map.addValue("user_id", userId);
 
