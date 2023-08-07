@@ -8,13 +8,14 @@ import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
-import ru.yandex.practicum.filmorate.storage.DAO.DirectorDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.FeedDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.Interface.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.Interface.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.Interface.UserStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,9 +89,11 @@ public class FilmService {
     public List<Film> findMutualFilms(Integer userId, Integer friendId) {
         userStorage.findUserById(userId);
         userStorage.findUserById(friendId);
-        return filmStorage.findMutualFilms(userId, friendId).stream().sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
-                .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
-        ).collect(Collectors.toList());
+        return filmStorage.findMutualFilms(userId, friendId)
+                .stream()
+                .sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
+                        .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
+                ).collect(Collectors.toList());
     }
 
     public void deleteById(Integer id) {
@@ -119,11 +122,15 @@ public class FilmService {
         }
     }
 
-    public List<Film> getRecommendations(int userId, int friendId) {
-        List<Film> recommendations = filmStorage.getRecommendations(userId, friendId);
-        return recommendations.stream()
-                .filter(film -> film.getLikes().contains(friendId) && !film.getLikes().contains(userId))
-                .collect(Collectors.toList());
+    public List<Film> recommendations(int userId, int friendId) {
+        List<Film> films = filmStorage.recommendations(userId, friendId);
+        List<Film> recommendations = new ArrayList<>();
+        for (Film film : films) {
+            if (film.getLikes().contains(friendId) && !film.getLikes().contains(userId)) {
+                recommendations.add(film);
+            }
+        }
+        return recommendations;
     }
 
     public List<Film> searchFilms(String query, List<String> searchByParams) {

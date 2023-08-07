@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.MpaModel;
-import ru.yandex.practicum.filmorate.storage.DAO.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.MpaDbStorage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

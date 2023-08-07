@@ -9,8 +9,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
-import ru.yandex.practicum.filmorate.storage.DAO.FeedDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.UserDbStorage;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -25,6 +25,12 @@ public class UserService {
     private final FeedDbStorage feedStorage;
 
     private final FilmService filmService;
+
+    private static void checkNameUser(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+    }
 
     public List<User> findAll() {
         return userStorage.findAll();
@@ -100,13 +106,7 @@ public class UserService {
         return userStorage.deleteById(id);
     }
 
-    private static void checkNameUser(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-    }
-
-    public List<Film> getRecommendations(int userId) {
+    public List<Film> recommendations(int userId) {
         findUserById(userId);
         int id = -1;
         int max = 0;
@@ -122,7 +122,7 @@ public class UserService {
         if (id == -1) {
             return new ArrayList<>();
         }
-        return filmService.getRecommendations(userId, id);
+        return filmService.recommendations(userId, id);
     }
 
     public List<Feed> getFeed(Integer userId) {
