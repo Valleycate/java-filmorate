@@ -40,10 +40,6 @@ public class FilmController {
         return filmService.findMutualFilms(userId, friendId);
     }
 
-    @GetMapping("/common")
-    public List<Film> findMutualFilm(@RequestParam Integer userId, @RequestParam Integer friendId) {
-        return filmService.findMutualFilms(userId, friendId);
-    }
 
     @GetMapping("/{id}")
     public Film findFilmById(@PathVariable Integer id) {

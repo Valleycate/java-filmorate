@@ -107,7 +107,7 @@ public class UserService {
         }
     }
 
-    public List<Film> recommendations(int userId) {
+    public List<Film> getRecommendations(int userId) {
         findUserById(userId);
         int id = -1;
         int max = 0;
@@ -123,26 +123,11 @@ public class UserService {
         if (id == -1) {
             return new ArrayList<>();
         }
-        return filmService.recommendations(userId, id);
+        return filmService.getRecommendations(userId, id);
     }
 
     public List<Feed> getFeed(Integer userId) {
         findUserById(userId);
         return feedStorage.findUsersFeed(userId);
-    }
-    public List<Film> recommendations(int userId){
-
-    public List<Film> recommendations(int userId) {
-        findUserById(userId);
-        int id = userId;
-        int max = 0;
-        for (User user : userStorage.findAll()) {
-            int size = filmService.findMutualFilms(userId, user.getId()).size();
-            if (size > max) {
-                id = user.getId();
-                max = size;
-            }
-        }
-        return filmService.recommendations(userId, id);
     }
 }
