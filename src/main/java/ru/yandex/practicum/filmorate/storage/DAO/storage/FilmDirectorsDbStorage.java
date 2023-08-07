@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.storage.DAO.mapper.DirectorRowMapper;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -19,7 +20,7 @@ public class FilmDirectorsDbStorage {
 
     private final NamedParameterJdbcOperations jdbcOperations;
 
-    public void updateDirectorsOfFilm(int filmId, ArrayList<Director> directorsId) {
+    public void updateDirectorsOfFilm(int filmId, List<Director> directorsId) {
 
         if (directorsId != null) {
             for (Director i : directorsId) {
@@ -44,7 +45,7 @@ public class FilmDirectorsDbStorage {
         }
     }
 
-    public ArrayList<Director> getDirectorsOfFilm(int filmId) {
+    public List<Director> getDirectorsOfFilm(int filmId) {
 
         final String sqlQuery = "SELECT * " +
                 "FROM DIRECTORS " +

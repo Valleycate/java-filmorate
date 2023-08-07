@@ -17,7 +17,7 @@ import java.util.*;
 public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    protected ArrayList<GenreModel> updateGenre(ArrayList<GenreModel> genreFilm, int filmId) {
+    protected List<GenreModel> updateGenre(ArrayList<GenreModel> genreFilm, int filmId) {
         if (genreFilm != null) {
             jdbcTemplate.update("DELETE FROM FILM_GENRE WHERE film_id =?;", filmId);
             Set<Integer> genreId = new HashSet<>();
@@ -34,7 +34,7 @@ public class GenreDbStorage implements GenreStorage {
         return new ArrayList<>();
     }
 
-    protected ArrayList<GenreModel> getGenresFilm(int filmId) {
+    protected List<GenreModel> getGenresFilm(int filmId) {
         List<Map<String, Object>> rowsGenre = jdbcTemplate.queryForList("select genre_id " +
                 "from Film_genre " +
                 "where film_id = ?;", filmId);

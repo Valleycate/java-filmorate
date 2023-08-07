@@ -25,7 +25,7 @@ public class UserService {
     private final FeedDbStorage feedStorage;
     private final FilmService filmService;
 
-    private static void checkNameUser(User user) {
+    private void checkNameUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
@@ -82,6 +82,7 @@ public class UserService {
         return userStorage.allFriends(userStorage.findUserById(id));
     }
 
+
     public User deleteById(Integer id) {
         if (id <= 0) {
             throw new NonexistentException("incorect if for delete user");
@@ -92,7 +93,7 @@ public class UserService {
         return userStorage.deleteById(id);
     }
 
-    public List<Film> recommendations(int userId) {
+    public List<Film> getRecommendations(int userId) {
         findUserById(userId);
         int id = -1;
         int max = 0;
@@ -108,7 +109,7 @@ public class UserService {
         if (id == -1) {
             return new ArrayList<>();
         }
-        return filmService.recommendations(userId, id);
+        return filmService.getRecommendations(userId, id);
     }
 
     public List<Feed> getFeed(Integer userId) {

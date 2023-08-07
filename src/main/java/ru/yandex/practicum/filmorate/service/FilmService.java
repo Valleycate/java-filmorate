@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.DAO.Interface.UserStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.util.FeedSaver;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,7 +87,7 @@ public class FilmService {
         filmStorage.deleteById(id);
     }
 
-    public List<Film> sortedFilmsOfDirector(int directorId, String param) {
+    public List<Film> getSortedFilmsOfDirector(int directorId, String param) {
         if (directorDbStorage.getDirector(directorId) != null) {
             switch (param) {
                 case "year":
@@ -107,15 +106,11 @@ public class FilmService {
         }
     }
 
-    public List<Film> recommendations(int userId, int friendId) {
-        List<Film> films = filmStorage.recommendations(userId, friendId);
-        List<Film> recommendations = new ArrayList<>();
-        for (Film film : films) {
-            if (film.getLikes().contains(friendId) && !film.getLikes().contains(userId)) {
-                recommendations.add(film);
-            }
-        }
-        return recommendations;
+    public List<Film> getRecommendations(int userId, int friendId) {
+        List<Film> recommendations = filmStorage.getRecommendations(userId, friendId);
+        return recommendations.stream()
+                .filter(film -> film.getLikes().contains(friendId) && !film.getLikes().contains(userId))
+                .collect(Collectors.toList());
     }
 
     public List<Film> searchFilms(String query, List<String> searchByParams) {

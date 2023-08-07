@@ -18,6 +18,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Repository
 @Primary
@@ -69,7 +70,7 @@ public class FilmDbStorage implements FilmStorage {
         genreDbStorage.updateGenre(film.getGenres(), film.getId());
         filmDirectorsDbStorage.updateDirectorsOfFilm(film.getId(), film.getDirectors());
         film.setMpa(mpaDbStorage.getMpaModel(film.getMpa().getId()));
-        film.setGenres(genreDbStorage.getGenresFilm(film.getId()));
+        film.setGenres(new ArrayList<>(genreDbStorage.getGenresFilm(film.getId())));
         film.setDirectors(filmDirectorsDbStorage.getDirectorsOfFilm(film.getId()));
         return film;
     }
@@ -90,7 +91,7 @@ public class FilmDbStorage implements FilmStorage {
         likeDbStorage.updateLikes(film.getLikes(), film.getId());
         filmDirectorsDbStorage.updateDirectorsOfFilm(film.getId(), film.getDirectors());
         film.setDirectors(filmDirectorsDbStorage.getDirectorsOfFilm(film.getId()));
-        film.setGenres(genreDbStorage.updateGenre(film.getGenres(), film.getId()));
+        film.setGenres(new ArrayList<>(genreDbStorage.updateGenre(film.getGenres(), film.getId())));
         film.setMpa(mpaDbStorage.getMpaModel(film.getMpa().getId()));
         return film;
     }
@@ -100,7 +101,7 @@ public class FilmDbStorage implements FilmStorage {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from Film where id = ?;", id);
         if (filmRows.next()) {
             Film film = makeFilm(filmRows);
-            film.setGenres(genreDbStorage.getGenresFilm(id));
+            film.setGenres(new ArrayList<>(genreDbStorage.getGenresFilm(id)));
             film.setLikes(likeDbStorage.getLikes(id));
             film.setDirectors(filmDirectorsDbStorage.getDirectorsOfFilm(film.getId()));
             return film;
@@ -114,7 +115,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setId(filmRows.getInt("id"));
         film.setName(filmRows.getString("name"));
         film.setDescription(filmRows.getString("description"));
-        film.setReleaseDate(filmRows.getDate("release_date").toLocalDate());
+        film.setReleaseDate(Objects.requireNonNull(filmRows.getDate("release_date")).toLocalDate());
         film.setDuration(filmRows.getInt("duration"));
         film.setMpa(mpaDbStorage.getMpaModel(filmRows.getInt("rating_id")));
         return film;
@@ -272,32 +273,21 @@ public class FilmDbStorage implements FilmStorage {
             obj.setReleaseDate(Date.valueOf(map.get("release_date").toString()).toLocalDate());
             obj.setDuration((Integer) map.get("duration"));
             obj.setMpa(mpaDbStorage.getMpaModel((Integer) map.get("rating_id")));
-            obj.setGenres(genreDbStorage.getGenresFilm(obj.getId()));
+            obj.setGenres(new ArrayList<>(genreDbStorage.getGenresFilm(obj.getId())));
             obj.setLikes(likeDbStorage.getLikes(obj.getId()));
             obj.setDirectors(filmDirectorsDbStorage.getDirectorsOfFilm(obj.getId()));
             films.add(obj);
         }
     }
 
-    public List<Film> recommendations(int userId, int friendId) {
+    public List<Film> getRecommendations(int userId, int friendId) {
         List<Film> films = new ArrayList<>();
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(
                 "SELECT  *\n" +
                         "FROM FILM \n" +
                         "INNER JOIN LIKES ON FILM.id = LIKES.film_id\n" +
                         "WHERE LIKES.user_id = ? AND LIKES.user_id != ?;", friendId, userId);
-        for (Map<String, Object> map : rows) {
-            Film obj = new Film();
-            obj.setId((Integer) map.get("id"));
-            obj.setName((String) map.get("name"));
-            obj.setDescription((String) map.get("description"));
-            obj.setReleaseDate(Date.valueOf(map.get("release_date").toString()).toLocalDate());
-            obj.setDuration((Integer) map.get("duration"));
-            obj.setMpa(mpaDbStorage.getMpaModel((Integer) map.get("rating_id")));
-            obj.setGenres(genreDbStorage.getGenresFilm(obj.getId()));
-            obj.setLikes(likeDbStorage.getLikes(obj.getId()));
-            films.add(obj);
-        }
+        getFilmsList(films, rows);
         return films;
     }
 }
