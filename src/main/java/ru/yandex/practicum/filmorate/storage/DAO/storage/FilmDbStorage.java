@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.DAO;
+package ru.yandex.practicum.filmorate.storage.DAO.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.exceptions.validationException.BadRequest;
 import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidIdException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaModel;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.Interface.FilmStorage;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.DAO;
+package ru.yandex.practicum.filmorate.storage.DAO.storage;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

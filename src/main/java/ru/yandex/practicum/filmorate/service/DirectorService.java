@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.validationException.InvalidNameException;
 import ru.yandex.practicum.filmorate.model.Director;
-import ru.yandex.practicum.filmorate.storage.DAO.DirectorDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.DirectorDbStorage;
 
 import java.util.List;
 
@@ -13,6 +13,12 @@ import java.util.List;
 public class DirectorService {
 
     private final DirectorDbStorage directorDbStorage;
+
+    private static void checkName(Director director) {
+        if (director.getName() == null || director.getName().isBlank()) {
+            throw new InvalidNameException("Имя некорректное");
+        }
+    }
 
     public List<Director> getAllDirectors() {
         return directorDbStorage.getDirectors();
@@ -34,11 +40,5 @@ public class DirectorService {
 
     public void deleteDirector(int id) {
         directorDbStorage.delete(id);
-    }
-
-    private static void checkName(Director director) {
-        if (director.getName() == null || director.getName().isBlank()) {
-            throw new InvalidNameException("Имя некорректное");
-        }
     }
 }

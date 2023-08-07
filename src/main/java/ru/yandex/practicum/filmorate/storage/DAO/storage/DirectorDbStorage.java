@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.DAO;
+package ru.yandex.practicum.filmorate.storage.DAO.storage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.model.Director;
+import ru.yandex.practicum.filmorate.storage.DAO.mapper.DirectorRowMapper;
 
 import java.util.List;
 import java.util.Map;

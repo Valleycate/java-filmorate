@@ -7,11 +7,11 @@ import ru.yandex.practicum.filmorate.model.Feed;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
-import ru.yandex.practicum.filmorate.storage.DAO.FeedDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.ReviewDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.ReviewLikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.Interface.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.Interface.UserStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.ReviewDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.ReviewLikeDbStorage;
 
 import java.time.Instant;
 import java.util.Comparator;
