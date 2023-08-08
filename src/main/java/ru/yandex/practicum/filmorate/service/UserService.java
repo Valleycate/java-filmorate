@@ -9,9 +9,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
+import ru.yandex.practicum.filmorate.service.util.FeedSaver;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.FeedDbStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.UserDbStorage;
-import ru.yandex.practicum.filmorate.util.FeedSaver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +24,7 @@ public class UserService {
     private final UserDbStorage userStorage;
     private final FeedDbStorage feedStorage;
     private final FilmService filmService;
+    private final FeedSaver feedSaver;
 
     private void checkNameUser(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
@@ -60,12 +61,12 @@ public class UserService {
 
     public void addFriend(User user, User friend) {
         userStorage.addFriend(user, friend);
-        FeedSaver.saveFeed(user.getId(), (long) friend.getId(), EnumEventType.FRIEND, EnumOperation.ADD);
+        feedSaver.saveFeed(user.getId(), (long) friend.getId(), EnumEventType.FRIEND, EnumOperation.ADD);
     }
 
     public void deleteFriend(User user, User friend) {
         userStorage.deleteFriend(user, friend);
-        FeedSaver.saveFeed(user.getId(), (long) friend.getId(), EnumEventType.FRIEND, EnumOperation.REMOVE);
+        feedSaver.saveFeed(user.getId(), (long) friend.getId(), EnumEventType.FRIEND, EnumOperation.REMOVE);
     }
 
     public List<User> findMutualFriends(Integer id, Integer otherId) {

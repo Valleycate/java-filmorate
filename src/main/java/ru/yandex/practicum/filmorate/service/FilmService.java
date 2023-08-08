@@ -7,11 +7,11 @@ import ru.yandex.practicum.filmorate.exceptions.NonexistentException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.enums.EnumEventType;
 import ru.yandex.practicum.filmorate.model.enums.EnumOperation;
+import ru.yandex.practicum.filmorate.service.util.FeedSaver;
 import ru.yandex.practicum.filmorate.storage.DAO.Interface.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.Interface.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.Interface.UserStorage;
 import ru.yandex.practicum.filmorate.storage.DAO.storage.DirectorDbStorage;
-import ru.yandex.practicum.filmorate.util.FeedSaver;
 
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +25,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final DirectorDbStorage directorDbStorage;
     private final GenreStorage genreStorage;
+    private final FeedSaver feedSaver;
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -47,7 +48,7 @@ public class FilmService {
         log.info("Поставлен лайк фильму {}", film);
         film.getLikes().add(userId);
         filmStorage.update(film);
-        FeedSaver.saveFeed(userId, (long) film.getId(), EnumEventType.LIKE, EnumOperation.ADD);
+        feedSaver.saveFeed(userId, (long) film.getId(), EnumEventType.LIKE, EnumOperation.ADD);
     }
 
     public void deleteLike(Integer userId, Film film) {
@@ -60,7 +61,7 @@ public class FilmService {
             log.info("Удалён лайк фильму {}", film);
             filmStorage.update(film);
         }
-        FeedSaver.saveFeed(userId, (long) film.getId(), EnumEventType.LIKE, EnumOperation.REMOVE);
+        feedSaver.saveFeed(userId, (long) film.getId(), EnumEventType.LIKE, EnumOperation.REMOVE);
     }
 
     public List<Film> findTop10Films(int count, Integer genreId, Integer year) {
@@ -73,11 +74,7 @@ public class FilmService {
     public List<Film> findMutualFilms(Integer userId, Integer friendId) {
         userStorage.findUserById(userId);
         userStorage.findUserById(friendId);
-        return filmStorage.findMutualFilms(userId, friendId)
-                .stream()
-                .sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
-                        .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
-                ).collect(Collectors.toList());
+        return getSortedFilmsByLikes(filmStorage.findMutualFilms(userId, friendId));
     }
 
     public void deleteById(Integer id) {
@@ -93,11 +90,7 @@ public class FilmService {
                 case "year":
                     return filmStorage.getSortedByYearFilmsOfDirector(directorId);
                 case "likes":
-                    return filmStorage.getDirectorsFilms(directorId).stream()
-                            .sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
-                                    .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
-                            )
-                            .collect(Collectors.toList());
+                    return getSortedFilmsByLikes(filmStorage.getDirectorsFilms(directorId));
                 default:
                     return null;
             }
@@ -115,5 +108,13 @@ public class FilmService {
 
     public List<Film> searchFilms(String query, List<String> searchByParams) {
         return filmStorage.searchFilms(query, searchByParams);
+    }
+
+    private List<Film> getSortedFilmsByLikes(List<Film> filmsList) {
+        return filmsList.stream()
+                .sorted(Comparator.<Film>comparingInt(o -> o.getLikes().size())
+                        .thenComparing(Film::getId, Comparator.reverseOrder()).reversed()
+                )
+                .collect(Collectors.toList());
     }
 }
