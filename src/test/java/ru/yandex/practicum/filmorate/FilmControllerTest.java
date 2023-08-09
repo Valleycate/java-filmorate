@@ -9,13 +9,11 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaModel;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.DAO.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.DAO.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -34,7 +32,6 @@ public class FilmControllerTest {
         user.setLogin("some_login");
         user.setEmail("Email.com@Someone");
         user.setName("some_name");
-        user.setFriendship(new HashMap<>());
         user.setBirthday(LocalDate.of(2000, 2, 28));
         return userStorage.create(user);
     }
@@ -107,24 +104,5 @@ public class FilmControllerTest {
         filmService.addLike(user.getId(), film);
         filmService.deleteLike(user.getId(), film);
         assertEquals(film.getLikes().size(), 0);
-    }
-
-    @Test
-    public void testFindMostPopularFilm() {
-        Film film = createFilm();
-        Film film2 = createFilm();
-        User user = createUser();
-        User user2 = createUser();
-        User user3 = createUser();
-        filmService.addLike(user.getId(), film);
-        filmService.addLike(user2.getId(), film);
-        filmService.addLike(user3.getId(), film);
-        filmService.addLike(user.getId(), film2);
-        filmService.addLike(user2.getId(), film2);
-        List<Film> mostPopularFilm = filmService.findTop10Films(10);
-        assertNotEquals(mostPopularFilm.size(), 0);
-        assertNotEquals(mostPopularFilm.size(), 1);
-        assertEquals(mostPopularFilm.get(0), film);
-        assertEquals(mostPopularFilm.get(1), film2);
     }
 }

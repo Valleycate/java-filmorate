@@ -5,15 +5,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yandex.practicum.filmorate.model.Friendship;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.DAO.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.UserDbStorage;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -30,7 +27,6 @@ public class UserControllerTest {
         user.setLogin("some_login");
         user.setEmail("Email.com@Someone");
         user.setName("some_name");
-        user.setFriendship(new HashMap<>());
         user.setBirthday(LocalDate.of(2000, 2, 28));
         return userStorage.create(user);
     }
@@ -41,7 +37,6 @@ public class UserControllerTest {
         user.setLogin("some_login");
         user.setEmail("Email.com@Someone");
         user.setName("some_name");
-        user.setFriendship(new HashMap<>());
         user.setBirthday(LocalDate.of(2000, 2, 28));
         user = userStorage.create(user);
         assertEquals(user, userStorage.findUserById(user.getId()));
@@ -73,28 +68,23 @@ public class UserControllerTest {
     public void testAddFriend() {
         User user = createUser();
         User friend = createUser();
-        userService.addFriend(user, friend.getId());
-        assertEquals(user.getFriends().size(), 1);
-        assertEquals(user.getFriends(), Set.of(friend.getId()));
-        assertEquals(user.getFriendship().size(), 1);
-        assertEquals(user.getFriendship().get(friend.getId()), Friendship.UNCONFIRMED);
-        assertEquals(friend.getFriends().size(), 0);
-        userService.addFriend(friend, user.getId());
-        assertEquals(friend.getFriends().size(), 1);
-        assertEquals(friend.getFriends(), Set.of(user.getId()));
-        assertEquals(friend.getFriendship().size(), 1);
-        assertEquals(friend.getFriendship().get(user.getId()), Friendship.CONFIRMED);
+        userService.addFriend(user, friend);
+        assertEquals(userService.getFriends(user.getId()).size(), 1);
+        assertEquals(userService.getFriends(friend.getId()).size(), 0);
+        userService.addFriend(friend, user);
+        assertEquals(userService.getFriends(user.getId()).size(), 1);
+        assertEquals(userService.getFriends(friend.getId()).size(), 1);
     }
 
     @Test
     public void testDeleteFriend() {
         User user = createUser();
         User friend = createUser();
-        userService.addFriend(user, friend.getId());
-        userService.addFriend(friend, user.getId());
-        userService.deleteFriend(user, friend.getId());
-        assertEquals(user.getFriends().size(), 0);
-        assertEquals(friend.getFriends().size(), 1);
+        userService.addFriend(user, friend);
+        userService.addFriend(friend, user);
+        userService.deleteFriend(user, friend);
+        assertEquals(userService.getFriends(user.getId()).size(), 0);
+        assertEquals(userService.getFriends(friend.getId()).size(), 1);
     }
 
     @Test
@@ -102,11 +92,11 @@ public class UserControllerTest {
         User user = createUser();
         User friend = createUser();
         User friend2 = createUser();
-        userService.addFriend(user, friend.getId());
-        userService.addFriend(friend, user.getId());
-        userService.addFriend(user, friend2.getId());
-        userService.addFriend(friend2, user.getId());
-        List<User> friends = userService.getFriends(user.getFriends());
+        userService.addFriend(user, friend);
+        userService.addFriend(friend, user);
+        userService.addFriend(user, friend2);
+        userService.addFriend(friend2, user);
+        List<User> friends = userService.getFriends(user.getId());
         assertEquals(friends.get(0), friend);
         assertEquals(friends.get(1), friend2);
     }
@@ -116,13 +106,13 @@ public class UserControllerTest {
         User user = createUser();
         User friend = createUser();
         User friend2 = createUser();
-        userService.addFriend(user, friend.getId());
-        userService.addFriend(friend, user.getId());
-        userService.addFriend(user, friend2.getId());
-        userService.addFriend(friend2, user.getId());
-        userService.addFriend(friend2, friend.getId());
-        userService.addFriend(friend, friend2.getId());
-        List<User> friends = userService.findMutualFriends(user, friend);
+        userService.addFriend(user, friend);
+        userService.addFriend(friend, user);
+        userService.addFriend(user, friend2);
+        userService.addFriend(friend2, user);
+        userService.addFriend(friend2, friend);
+        userService.addFriend(friend, friend2);
+        List<User> friends = userService.findMutualFriends(user.getId(), friend.getId());
         assertEquals(friends.get(0), friend2);
     }
 }

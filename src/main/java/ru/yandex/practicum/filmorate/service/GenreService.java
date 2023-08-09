@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.GenreModel;
-import ru.yandex.practicum.filmorate.storage.DAO.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.DAO.storage.GenreDbStorage;
 
 import java.util.List;
 
